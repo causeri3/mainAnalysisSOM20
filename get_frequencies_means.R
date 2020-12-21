@@ -1,17 +1,21 @@
-#GET FREQUENCIES / MEANS OF SURVEY ANSWERS AGGREGATED FOR SETTLEMENT TYPE (IDP/HC) AND AREA LEVEL AS WIDE FORMAT [UNWEIGHTED, ONLY FOR SAME AEREA LEVEL AS STRATA, IF NON-PROBABILISTIC SAMLING]
+#GET FREQUENCIES / MEANS OF SURVEY ANSWERS AGGREGATED FOR SETTLEMENT TYPE (IDP/HC) AND AREA LEVEL AS WIDE FORMAT [UNWEIGHTED, ONLY FOR SAME AEREA LEVEL AS STRATA, IF NON-PROBABILISTIC SAMPLING]
 library(reshape2)
 
 
 #set working directory
-setwd("C:/Users/Vanessa Causemann/Desktop/REACH/Data")
+setwd("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/GitHub/mainAnalysisSOM20")
+
 #import data set
-df_original <- read.csv(file="REACH_SOM2006_JMCNA_IV_Data-Set_August2020_October_27_2020.csv", head=T, dec=".", sep=",", na.strings=c(""," ","NA"))
+df_original <- read.csv(file="input/REACH_SOM2006_JMCNA_IV_Data-Set_August2020_October_27_2020.csv", head=T, dec=".", sep=",", na.strings=c(""," ","NA"))
 
 #############################################################################################################################################################################################
 #########MAKE ADAPTIONS SPECIFIC TO YOUR DATA SET############################################################################################################################################
 #############################################################################################################################################################################################
 
-#List of variables/columns you don't want to have frequencies computed on (i.e. character multiples or variables with only NA's) or ignore and continue at hashtag in line 82
+#grab "other" variables to exclude in vars-list
+other <- grep("_other", names(df_original), value = TRUE)
+
+#List of variables/columns you don't want to have frequencies computed on (i.e. character multiples or variables with only NA's) or ignore and continue after list
 vars=c('chronic_illness_hh_members',
        'dis_seeing_demog',
        'dis_hearing_demog',
@@ -78,103 +82,25 @@ vars=c('chronic_illness_hh_members',
        'hh_size_note',
        'X_uuid.1',
        'left_aoo',
-       'arrived_current')
+       'arrived_current',
+       'today',
+       'other',
+       'hh_difference',
+       'start',
+       'end',
+       'jmcna',
+       'deviceid',
+       'consensus',
+       'region',
+       other
+       )
 
-#List of all numerical variables
-num<-c('bedrooms',
-       'borrow_food',
-       'boys_labor',
-       'boys_not_safe',
-       'child_abducted',
-       'child_armed',
-       'child_detained',
-       'child_employment',
-       'child_labor_notes',
-       'child_married',
-       'child_missing',
-       'child_study',
-       'children_away_boys',
-       'children_away_girls',
-       'children_school_age',
-       'children_vaccine_age',
-       'covid_boys_6_12',
-       'covid_boys_13_17',
-       'covid_enrollement',
-       'covid_girls_6_12',
-       'covid_girls_13_17',
-       'difference_arrived_left_days',
-       'difference_arrived_today_days',
-       'displaced_locs',
-       'enrolled_boys_6_12',
-       'enrolled_boys_6_12e',
-       'enrolled_boys_13_17',
-       'enrolled_boys_13_17e',
-       'enrolled_girls_6_12',
-       'enrolled_girls_6_12e',
-       'enrolled_girls_13_17',
-       'enrolled_girls_13_17e',
-       'enrolled_total',
-       'enrollement_note',
-       'enrollement_note2',
-       'females_0m_5me',
-       'females_0m_5y',
-       'females_6_12',
-       'females_6_12me',
-       'females_13_15',
-       'females_13_15e',
-       'females_16_17',
-       'females_16_17e',
-       'females_18_40',
-       'females_18_40e',
-       'females_41_59',
-       'females_41_59e',
-       'females_60_over',
-       'females_60_overe',
-       'girls_labor',
-       'girls_not_safe',
-       'hh_children',
-       'hh_female',
-       'hh_members_income',
-       'hh_members_new_unemployed',
-       'HH_schoolaged_children',
-       'hh_shelter',
-       'hh_size',
-       'home_boys_6_12',
-       'home_boys_13_17',
-       'home_girls_6_12',
-       'home_girls_13_17',
-       'hosting_idp_number',
-       'kitchens',
-       'less_food',
-       'less_food_adult',
-       'living_rooms',
-       'males_0m_5me',
-       'males_0m_5y',
-       'males_6_12',
-       'males_6_12me',
-       'males_13_15',
-       'males_13_15e',
-       'males_16_17',
-       'males_16_17e',
-       'males_18_40',
-       'males_18_40e',
-       'males_41_59',
-       'males_41_59e',
-       'males_60_over',
-       'males_60_overe',
-       'men_not_safe',
-       'no_toilet',
-       'out_of_school',
-       'portion_limit',
-       'reduce_meals',
-       'rely_on_lessprefered',
-       'remote_education',
-       'restrict_consumption',
-       'rooms_total',
-       'shelter_rooms_note',
-       'toilets',
-       'total_hh',
-       'women_not_safe')
+#list of all numeric variables (minus vars-list and multiples)
+num <- which(unlist(lapply(df_original, is.numeric)))
+num<-names(df_original[,num])
+multiple <- grep("[.]", names(df_original), value = TRUE)
+num<-num[num %in% multiple ==FALSE]
+num<-num[num %in% vars ==FALSE]
 
 #Put the name of the column with the area level you want to compute frequencies on instead of "district"
 names(df_original)[which(names(df_original) == "district")]<-"area_level"
@@ -191,15 +117,14 @@ df_original$settlement_type[df_original$settlement_type=="no"]<-"HC"
 
 index<-which(names(df_original)%in%vars)                                                                               #save list of indexes of columns in vars
 index_num<-which(names(df_original)%in%num)                                                                            #save list of indexes of columns in num
-index_other<-which(grepl("_other",names(df_original)))                                                                 #get index of all columns containing "_other" in column name         
-index<-c(index,index_num,index_other)                                                                                  #add the "_other" columns to the list of indexes which will be deleted          
-df<-df_original[-index]                                                                                                #get rid of above listed columns in "vars" and all "_other" columns
-df_num<-df_original[index_num]                                                                                         #make data frame only with numericals
-df_num$settlement_type<-df$settlement_type
-df_num$area_level<-df$area_level
+index<-c(index,index_num)                                                                                              #list of indexes which will be removed          
+df<-df_original[-index]                                                                                                #make subset without numeric and not wanted variables
+df_num<-df_original[index_num]                                                                                         #make data frame only with numerical variables
+df_num$settlement_type<-df$settlement_type                                                                             #add settlement type to subset
+df_num$area_level<-df$area_level                                                                                       #add area to subset 
 
-#Change "12" to the column number you want to start the loop compute frequencies over all following variables/columns
-start<-12
+#Change "5" to the column number you want to start the loop compute frequencies over all following variables/columns
+start<-5
 
 
 #############################################################################################################################################################################################
@@ -209,6 +134,7 @@ start<-12
 #####IDP-TABLE#####
 
 u_distr_idp<-unique(df$area_level[df$settlement_type=="IDP"])                                                          #unique list of areas which have idp-settlements  
+
 start_time <- Sys.time()                                                                                               #timer for fun
 
 for (i in start:length(df)){                                                                                           #loop over all columns from "start" onward
@@ -234,6 +160,7 @@ end_time - start_time                                                           
 #####NON-IDP-TABLE#####
 
 u_distr_host<-unique(df$area_level[df$settlement_type=="HC"])                                                           #unique list of areas which have non-idp-settlements                  
+
 start_time <- Sys.time()                                                                                                #timer
 
 for (i in start:length(df)){                                                                                            #loop over all columns from "start" onward
@@ -256,6 +183,7 @@ end_time - start_time                                                           
 
 
 #####IDP-TABLE [NUMERIC]#####
+
 u_distr_idp<-unique(df$area_level[df$settlement_type=="IDP"])                                                           #unique list of areas which have idp-settlements                  
 
 start_time <- Sys.time()                                                                                                #timer
@@ -292,7 +220,6 @@ end_time <- Sys.time()                                                          
 end_time - start_time                                                                                                   #timer
 
 
-
 #####JOIN TABLES AND FORMAT WIDE#####
 colnames(long_table_num_non_idp)[1:2]<-c("variables", "Freq")                                                           #fit column naming                  
 colnames(long_table_num_idp)[1:2]<-c("variables", "Freq")                                                               #fit column naming              
@@ -307,4 +234,4 @@ wide_table<-wide_table[-index2]                                                 
 
 #####EXPORT#####
 
-write.csv(wide_table,"frequency_means_table.csv", row.names=FALSE)
+write.csv(wide_table,"output/frequency_means_table.csv", row.names=FALSE)
