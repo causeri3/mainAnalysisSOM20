@@ -56,7 +56,7 @@ df$A1<- rep(NA, nrow(df))
 df$A1[df$household_expenditure=="adult_female" |df$household_expenditure=="adult_male"]<-1
 df$A1[df$household_expenditure=="eldery_female" |df$household_expenditure=="eldery_male"]<-3
 df$A1[df$household_expenditure=="female_14_17" |df$household_expenditure=="male_14_17"]<-4
-df$A1[df$household_expenditure=="female_13" |df$household_expenditure=="male_13"]<-"4"
+df$A1[df$household_expenditure=="female_13" |df$household_expenditure=="male_13"]<-"4+"
 
 
 df$A2[df$breadwinner=="adult_female" |df$breadwinner=="adult_male"]<-1
@@ -124,8 +124,9 @@ df$B3[df$hh_members_new_unemployed==0]<-0
 df$B3[df$hh_members_new_unemployed>0]<-1
 
 df$B4<- rep(NA, nrow(df))
-df$B4[df$hh_members_income==0]<-1
 df$B4[df$hh_members_income>0]<-0
+df$B4[df$hh_members_income==0]<-1
+
 
 df$B5<- rep(NA, nrow(df))
 df$B5[df$employ_loss_why.end_contract=="1" | df$employ_loss_why.other=="1"]<-1
@@ -251,10 +252,10 @@ df$F3[df$hand_washing_facility=="buckets_with_taps"|df$hand_washing_facility=="s
 df$F2[df$hand_washing_facility=="no_specific"]<-1
 
 df$F3<- rep(NA, nrow(df))
-df$F3[df$health_time=="less15"|df$health_time=="16_30"|df$health_time=="31_60"]<-0
-#df$F3[(df$health_time=="60_180"|df$health_time=="above180")&(df$health_transport=="car"|df$health_transport=="cart"|df$health_transport=="moto"|df$health_transport=="bus")]<-0
+df$F3[df$health_time=="less15"|df$health_time=="16_30"|df$health_time=="31_60"]<-1
+#df$F3[(df$health_time=="60_180"|df$health_time=="above180")&(df$health_transport=="car"|df$health_transport=="cart"|df$health_transport=="moto"|df$health_transport=="bus")]<-1
 #35 households with 0 instead NA for following version:
-df$F3[df$health_transport=="car"|df$health_transport=="cart"|df$health_transport=="moto"|df$health_transport=="bus"]<-0
+df$F3[df$health_transport=="car"|df$health_transport=="cart"|df$health_transport=="moto"|df$health_transport=="bus"]<-1
 df$F3[(df$health_transport=="walking"|df$health_transport=="have_not"|df$health_transport=="treatment_toofar") & (df$health_time=="60_180"|df$health_time=="above180")]<-4
 
 df$F4<- rep(NA, nrow(df))
@@ -266,7 +267,7 @@ df$F5<- rep(0, nrow(df))
 df$F5[df$chronic_illness=="yes" | df$females_60_over>0 | df$males_60_over>0]<-1
 
 df$F6<- rep(NA, nrow(df))
-df$F6[df$SD<=1]<-0
+df$F6[df$SD<=1]<-1
 df$F6[1<df$SD & df$SD <=2]<-2
 df$F6[2<df$SD & df$SD <=2.5]<-3
 df$F6[df$SD>2.5]<-4
@@ -287,7 +288,7 @@ df$F6[df$SD>2.5]<-4
 ######education######################################################################################################
 
 df$G1<- rep(NA, nrow(df))
-df$G1[df$HH_schoolaged_children==df$enrollement_note]<-0
+df$G1[df$HH_schoolaged_children==df$enrollement_note]<-1
 df$G1[df$HH_schoolaged_children>df$enrollement_note]<-3
 df$G1[df$HH_schoolaged_children>0 & df$enrollement_note<1]<-4
 
@@ -298,7 +299,7 @@ df$G2[df$covid_enrollement>0]<-1
 #G3 not scored: df$attend_covid19 (all dummies: df$attend_covid19.children_stay_home df$attend_covid19.no_teachers df$attend_covid19.lack_transport df$attend_covid19.parent_stay_home df$attend_covid19.school_closed df$attend_covid19.other df$attend_covid19.no_answer)
 
 df$G4<- rep(NA, nrow(df))
-df$G4[df$HH_schoolaged_children>0 & df$enrollement_note2<1]<-0
+df$G4[df$HH_schoolaged_children>0 & df$enrollement_note2<1]<-1
 df$G4[df$HH_schoolaged_children>df$enrollement_note2 & df$enrollement_note2>0]<-3
 df$G4[df$HH_schoolaged_children==df$enrollement_note2]<-4
 
@@ -334,6 +335,56 @@ df$G11[df$HH_schoolaged_children>0 & df$school_barrier_girls_note.security_conce
 
 #G12 not scored: df$cash_education (all dummies)
 #G13 not scored: df$home_learning (all dummies)
+
+######health######################################################################################################
+
+df$H1<- rep(NA, nrow(df))
+df$H1[df$health_household.none==1]<-1
+df$H1[df$health_household.yes_diarhea==1 | df$health_household.yes_fever==1 |df$health_household.yes_cough==1 | df$health_household.yes_skin==1 |df$health_household.yes_eye==1 | df$health_household.yes_wound==1 ]<-4
+
+df$H2<- rep(NA, nrow(df))
+df$H2[df$health_access=="no" | df$health_access=="no_seek"]<-0
+df$H2[df$health_access=="yes"]<-1
+
+df$H3<- rep(NA, nrow(df))
+df$H3[df$health_seek.private_clinic==1 | df$health_seek.private_physician==1 |df$health_seek.private_pharmacy==1 | df$health_seek.other_private_medical==1|df$health_seek.gov_hospital==1 | df$health_seek.government_center==1 | df$health_seek.government_post==1|df$health_seek.other_public==1 | df$health_seek.community_worker==1|df$health_seek.mobile_clinic_outreach==1 |df$health_seek.community_health_worker==1 |df$health_seek.mobile_clinic]<-0
+df$H3[df$health_seek.relative_friend==1|df$health_seek.shop_street==1 |df$health_seek.other==1 |df$health_seek.traditional_practitioner]<-1
+
+df$H4<- rep(NA, nrow(df))
+df$H4[df$children_vaccine_age>0 & df$unvaccinated_child=="no"]<-0
+df$H4[df$children_vaccine_age>0 & df$unvaccinated_child=="yes"]<-1
+
+df$H5<- rep(NA, nrow(df))
+df$H5[df$unvaccinated_why.no_issues==1 | df$unvaccinated_why.have_not==1]<-1
+df$H5[df$unvaccinated_why.public_not_open==1 | df$unvaccinated_why.lack_staff== 1]<-2
+df$H5[df$unvaccinated_why.cost_high==1 | df$unvaccinated_why.problems_civil== 1 | df$unvaccinated_why.public_clinic==1 | df$unvaccinated_why.treatment_toofar== 1| df$unvaccinated_why.no_medicine==1 | df$unvaccinated_why.no_treament== 1]<-3
+df$H5[df$unvaccinated_why.medical_refused==1 | df$unvaccinated_why.no_pwd==1]<-4
+
+df$H6<- rep(NA, nrow(df))
+df$H6[df$birth_where=="doctor" | df$birth_where=="nurse" | df$birth_where=="health_center" | df$birth_where=="government_health" | df$birth_where=="other_public" | df$birth_where=="private_hospital" | df$birth_where=="private_clinic" | df$birth_where=="private_maternity" | df$birth_where=="other_private"]<-0
+df$H6[df$birth_where=="respondent_s" | df$birth_where=="other_home" ]<-1
+
+df$H7<- rep(NA, nrow(df))
+df$H7[df$who_assist=="government_hospital" | df$who_assist=="government_clinic" | df$who_assist=="other_health" | df$who_assist=="traditional" | df$who_assist=="community"]<-1
+df$H7[df$who_assist=="relative" | df$who_assist=="other" ]<-3
+df$H7[df$who_assist=="relative" | df$who_assist=="other" ]<-"4+"
+
+df$H8<- rep(NA, nrow(df))
+df$H8[df$health_time=="less15"|df$health_time=="16_30"|df$health_time=="31_60"]<-1
+df$H8[df$health_transport=="car"|df$health_transport=="cart"|df$health_transport=="moto"|df$health_transport=="bus"]<-1
+df$H8[(df$health_transport=="walking"|df$health_transport=="have_not"|df$health_transport=="treatment_toofar") & (df$health_time=="60_180"|df$health_time=="above180")]<-4
+
+df$H9<- rep(NA, nrow(df))
+df$H9[df$health_mobile=="yes"]<-0
+df$H9[df$health_mobile=="no"]<-1
+
+df$H10<- rep(NA, nrow(df))
+df$H10[df$barriers_health.no_issues==1 | df$barriers_health.have_not]<-1
+df$H10[df$barriers_health.lack_staff==1 | df$barriers_health.public_not_open]<-2
+df$H10[df$barriers_health.cost_high==1 | df$barriers_health.problems_civil | df$barriers_health.public_clinic==1 | df$barriers_health.treatment_toofar | df$barriers_health.no_medicine==1 | df$barriers_health.no_treament]<-3
+df$H10[df$barriers_health.medical_refused==1 | df$barriers_health.no_pwd]<-4
+
+#H11 not scored: df$cash_health (all dummies)
 
 ######################Pregancy issue###############################################################################################
 incon30<-(df$pregnancy=="yes" & (df$females_16_17+df$females_13_15+df$females_18_40+df$females_41_59)==0)
