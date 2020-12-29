@@ -2,7 +2,7 @@ library(hypegrammaR)
 library(dplyr)
 
 #set working directory
-setwd("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/hypegrammaR")
+setwd("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/GitHub/mainAnalysisSOM20")
 
 #import all necessary files (data set, dap, sampling frame, choices and questions from kobo-tool)
 jmcna<-read.csv(file="input/REACH_SOM2006_JMCNA_IV_Data-Set_August2020_October_27_2020.csv", head=T, dec=".", sep=",", stringsAsFactors = F)
