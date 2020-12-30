@@ -14,6 +14,7 @@ adultish <- (df$females_16_17 + df$males_16_17 + df$females_18_40 + df$males_18_
 df$today<-as.Date(df$today-1, origin = '1900-01-01')                                          #because of Excel formatting
 days_displaced<-df$today - as.Date(df$left_aoo, "%d/%m/%Y")
 
+#SD: Shelter Density
 kitchens<-df$kitchens
 kitchens[is.na(kitchens)]<-0
 toilets<-df$toilets
@@ -21,11 +22,11 @@ toilets[is.na(toilets)]<-0
 df$SD<-df$hh_size/(df$sum_rooms-(kitchens+toilets))
 ######FSC-Indicators####################################################################################################
 
-#rSCI: multiply relevant questions with USW (universal severity weight) or with nothing if USW=1 and add
+#rSCI: reduced Coping Strategy Index; multiply relevant questions with USW (universal severity weight) or with nothing if USW=1 and add
 df$rCSI<- (df$rely_on_lessprefered + df$portion_limit + df$reduce_meals +(df$restrict_consumption*3) + (df$borrow_food*2))
 
 
-#HHS:create dummies and add to up HHS
+#HHS: Household Hunger Scale; create numeric variables and add to up
 #often,sometimes=1 rarely=0 
 hhs1<-rep(0, dim(df)[1])
 hhs1[df$fre_enough_food=="often"]<-2
@@ -282,7 +283,7 @@ df$F6[df$SD>2.5]<-4
 #df$chronic_illness_hh_members.female_13
 
 ####################################################################################################################################################################################################################################################################################################
-######LSG's & CG's##################################################################################################################################################################################################################################################################################
+######LIVING STANDARD & COPING GAPS#################################################################################################################################################################################################################################################################
 ####################################################################################################################################################################################################################################################################################################
 
 ######education######################################################################################################
@@ -347,8 +348,8 @@ df$H2[df$health_access=="no" | df$health_access=="no_seek"]<-0
 df$H2[df$health_access=="yes"]<-1
 
 df$H3<- rep(NA, nrow(df))
-df$H3[df$health_seek.private_clinic==1 | df$health_seek.private_physician==1 |df$health_seek.private_pharmacy==1 | df$health_seek.other_private_medical==1|df$health_seek.gov_hospital==1 | df$health_seek.government_center==1 | df$health_seek.government_post==1|df$health_seek.other_public==1 | df$health_seek.community_worker==1|df$health_seek.mobile_clinic_outreach==1 |df$health_seek.community_health_worker==1 |df$health_seek.mobile_clinic]<-0
-df$H3[df$health_seek.relative_friend==1|df$health_seek.shop_street==1 |df$health_seek.other==1 |df$health_seek.traditional_practitioner]<-1
+df$H3[df$health_seek.private_clinic==1 | df$health_seek.private_physician==1 |df$health_seek.private_pharmacy==1 | df$health_seek.other_private_medical==1|df$health_seek.gov_hospital==1 | df$health_seek.government_center==1 | df$health_seek.government_post==1|df$health_seek.other_public==1 | df$health_seek.community_worker==1|df$health_seek.mobile_clinic_outreach==1 |df$health_seek.community_health_worker==1 |df$health_seek.mobile_clinic==1]<-0
+df$H3[df$health_seek.relative_friend==1|df$health_seek.shop_street==1 |df$health_seek.other==1 |df$health_seek.traditional_practitioner==1]<-1
 
 df$H4<- rep(NA, nrow(df))
 df$H4[df$children_vaccine_age>0 & df$unvaccinated_child=="no"]<-0
@@ -365,9 +366,9 @@ df$H6[df$birth_where=="doctor" | df$birth_where=="nurse" | df$birth_where=="heal
 df$H6[df$birth_where=="respondent_s" | df$birth_where=="other_home" ]<-1
 
 df$H7<- rep(NA, nrow(df))
-df$H7[df$who_assist=="government_hospital" | df$who_assist=="government_clinic" | df$who_assist=="other_health" | df$who_assist=="traditional" | df$who_assist=="community"]<-1
-df$H7[df$who_assist=="relative" | df$who_assist=="other" ]<-3
-df$H7[df$who_assist=="relative" | df$who_assist=="other" ]<-"4+"
+df$H7[df$who_assist=="government_hospital" | df$who_assist=="government_clinic" | df$who_assist=="other_health" | df$who_assist=="traditional" | df$who_assist=="community"]<-0
+df$H7[df$who_assist=="relative" | df$who_assist=="other" ]<-1
+
 
 df$H8<- rep(NA, nrow(df))
 df$H8[df$health_time=="less15"|df$health_time=="16_30"|df$health_time=="31_60"]<-1
@@ -379,12 +380,76 @@ df$H9[df$health_mobile=="yes"]<-0
 df$H9[df$health_mobile=="no"]<-1
 
 df$H10<- rep(NA, nrow(df))
-df$H10[df$barriers_health.no_issues==1 | df$barriers_health.have_not]<-1
-df$H10[df$barriers_health.lack_staff==1 | df$barriers_health.public_not_open]<-2
-df$H10[df$barriers_health.cost_high==1 | df$barriers_health.problems_civil | df$barriers_health.public_clinic==1 | df$barriers_health.treatment_toofar | df$barriers_health.no_medicine==1 | df$barriers_health.no_treament]<-3
-df$H10[df$barriers_health.medical_refused==1 | df$barriers_health.no_pwd]<-4
+df$H10[df$barriers_health.no_issues==1 | df$barriers_health.have_not==1]<-1
+df$H10[df$barriers_health.lack_staff==1 | df$barriers_health.public_not_open==1]<-2
+df$H10[df$barriers_health.cost_high==1 | df$barriers_health.problems_civil==1 | df$barriers_health.public_clinic==1 | df$barriers_health.treatment_toofar==1 | df$barriers_health.no_medicine==1 | df$barriers_health.no_treament==1]<-3
+df$H10[df$barriers_health.medical_refused==1 | df$barriers_health.no_pwd==1]<-4
 
 #H11 not scored: df$cash_health (all dummies)
+
+######nutrition######################################################################################################
+
+df$I1<- rep(NA, nrow(df))
+df$I1[df$unusually_sleepy=="no" & df$child_fever=="no"]<-1
+df$I1[df$unusually_sleepy=="yes_7less" & df$child_fever=="yes_7less"]<-3
+df$I1[df$unusually_sleepy=="yes_7more" & df$child_fever=="yes_7more"]<-3
+
+df$I2<- rep(NA, nrow(df))
+df$I2[df$child_thin=="no"]<-0
+df$I2[df$child_thin=="yes"]<-1
+
+df$I3<- rep(NA, nrow(df))
+df$I3[df$eating_normally=="yes_eating"]<-1
+df$I3[df$eating_normally=="no_less2"]<-3
+df$I3[df$eating_normally=="no_less3"]<-4
+
+df$I4<- rep(NA, nrow(df))
+df$I4[df$child_thin=="no"]<-0
+df$I4[df$child_thin=="yes"]<-1
+
+df$I5<- rep(NA, nrow(df))
+df$I5[df$nutrition_time=="less15"|df$nutrition_time=="16_30"|df$nutrition_time=="31_60"]<-0
+df$I5[df$Nutrition_transport=="car"|df$Nutrition_transport=="cart"|df$Nutrition_transport=="moto"|df$Nutrition_transport=="bus"]<-0
+df$I5[df$Nutrition_transport=="walking" & (df$nutrition_time=="60_180"|df$nutrition_time=="above180")]<-1
+
+df$I6<- rep(NA, nrow(df))
+df$I6[df$nutrition_barriers.none==1]<-1
+df$I6[df$nutrition_barriers.unaware_services==1 | df$nutrition_barriers.unaware_supplements==1 | df$nutrition_barriers.facilities_not_staffed==1 | df$nutrition_barriers.not_enough_prov==1]<-2
+df$I6[df$nutrition_barriers.difficulty==1 | df$nutrition_barriers.facilities==1 | df$nutrition_barriers.prohibitive==1 ]<-3
+df$I6[df$nutrition_barriers.insecurity==1 | df$nutrition_barriers.inaccessible==1 | df$nutrition_barriers.inaccessible_clans==1 ]<-4
+
+######food security######################################################################################################
+
+df$J1<- rep(NA, nrow(df))
+df$J1[df$main_source_food.purchased_market==1 | df$main_source_food.own_cultivation==1 | df$main_source_food.own_livestock==1]<-1
+df$J1[df$main_source_food.fishing_Fishing==1 | df$main_source_food.foraging_Foraging==1 | df$main_source_food.hunting_Hunting==1 | df$main_source_food.bartering_Bartering==1 | df$main_source_food.other==1]<-3
+df$J1[df$main_source_food.reliant_friends==1 | df$main_source_food.reliant_assistance==1 | df$main_source_food.reliant_gov_assist==1 ]<-4
+
+df$J2<- rep(NA, nrow(df))
+df$J2[df$HHS==0]<-1
+df$J2[df$HHS==1]<-2
+df$J2[df$HHS==2 | df$HHS==3]<-3
+df$J2[df$HHS==4]<-4
+df$J2[df$HHS==5 | df$HHS==6]<-"4+"
+
+df$J3<- rep(NA, nrow(df))
+df$J3[df$rCSI<=3]<-1
+df$J3[df$rCSI>3 & df$rCSI<=18]<-2
+df$J3[df$rCSI>18 & df$rCSI<=42]<-3
+df$J3[df$rCSI>42]<-4
+
+df$J4<- rep(NA, nrow(df))
+df$J4[df$market_time=="less15"|df$market_time=="min_15_29"|df$market_time=="min_30_59"]<-0
+df$J4[df$market_transport=="car"|df$market_transport=="cart"|df$market_transport=="moto"|df$market_transport=="bus"]<-0
+df$J4[(df$market_transport=="walking") & (df$market_time=="hr_1_2"|df$market_time=="more2h")]<-1
+
+######Water Sanitation & Hygiene [WASH] ############################################################################################
+
+
+
+
+
+
 
 ######################Pregancy issue###############################################################################################
 incon30<-(df$pregnancy=="yes" & (df$females_16_17+df$females_13_15+df$females_18_40+df$females_41_59)==0)
