@@ -14,13 +14,14 @@ adultish <- (df$females_16_17 + df$males_16_17 + df$females_18_40 + df$males_18_
 df$today<-as.Date(df$today-1, origin = '1900-01-01')                                          #because of Excel formatting
 days_displaced<-df$today - as.Date(df$left_aoo, "%d/%m/%Y")
 
+#for adding and substracting: data set with 0's instead of NA's
+df_nona<-df
+df_nona[is.na(df_nona)]=0
+
 #SD: Shelter Density
-kitchens<-df$kitchens
-kitchens[is.na(kitchens)]<-0
-toilets<-df$toilets
-toilets[is.na(toilets)]<-0
-df$SD<-df$hh_size/(df$sum_rooms-(kitchens+toilets))
-######FSC-Indicators####################################################################################################
+df$SD<-df$hh_size/(df$sum_rooms-(df_nona$kitchens+df_nona$toilets))
+
+######FSC-Indicators##################################################################################################################################################
 
 #rSCI: reduced Coping Strategy Index; multiply relevant questions with USW (universal severity weight) or with nothing if USW=1 and add
 df$rCSI<- (df$rely_on_lessprefered + df$portion_limit + df$reduce_meals +(df$restrict_consumption*3) + (df$borrow_food*2))
@@ -52,7 +53,7 @@ df$HHS<-(hhs1+hhs2+hhs3)
 ######PRE-EXISTING VULNERABILITIES##################################################################################################################################################################################################################################################################
 ####################################################################################################################################################################################################################################################################################################
 
-######demographic######################################################################################################
+######demographic#####################################################################################################################################################
 df$A1<- rep(NA, nrow(df))
 df$A1[df$household_expenditure=="adult_female" |df$household_expenditure=="adult_male"]<-1
 df$A1[df$household_expenditure=="eldery_female" |df$household_expenditure=="eldery_male"]<-3
@@ -77,7 +78,7 @@ df$A5<- rep(NA, nrow(df))
 df$A5[(child_elderly/adultish)<0.8]<-0
 df$A5[(child_elderly/adultish)>=0.8]<-1
 
-######socioeconomic######################################################################################################
+######socioeconomic###################################################################################################################################################
 
 df$B1<- rep(NA, nrow(df))
 df$B1[df$income_src.business=="1" | df$income_src.cash_fishing=="1" |df$income_src.livestock_production=="1" | df$income_src.contracted_job=="1"|df$income_src.cash_crop_farming=="1" | df$income_src.rent_of_land=="1"]<-1
@@ -136,7 +137,7 @@ df$B5[df$employ_loss_why.floodings=="1" | df$employ_loss_why.drought=="1"]<-4
 df$B5[df$employ_loss_why.conflict=="1"]<-"4+"
 
 
-######displacement######################################################################################################
+######displacement####################################################################################################################################################
 
 df$C1<- rep(NA, nrow(df))
 df$C1[days_displaced<366]<-0
@@ -206,7 +207,7 @@ df$C2[df$displaced_locs>1]<-1
 #  ylab("# displaced locations") +
 #  theme_bw()
 
-######documentation######################################################################################################
+######documentation###################################################################################################################################################
 
 df$D1<- rep(NA, nrow(df))
 df$D1[df$certificate_ids=="all_id"|df$certificate_ids=="yes_id"]<-0
@@ -234,7 +235,7 @@ df$D1[df$certificate_ids=="some_id"|df$certificate_ids=="no_id"]<-1
 #hlp_problems.other
 #hlp_problems.not_sure
 
-######discrimination######################################################################################################
+######discrimination##################################################################################################################################################
 
 df$E1<- rep(NA, nrow(df))
 df$E1[df$factors_aid.None==1]<-0
@@ -242,7 +243,7 @@ df$E1[df$factors_aid.30.==1|df$factors_aid.60.==1|df$factors_aid.Disability._Per
 
 #E2 not scored: df$services_affected (all dummies: df$services_affected.access_remedies df$services_affected.security df$services_affected.health df$services_affected.education df$services_affected.water df$services_affected.food df$services_affected.cash df$services_affected.work df$services_affected.other)
 
-######COVID-related#######################################################################################################
+######COVID-related###################################################################################################################################################
 
 df$F1<- rep(NA, nrow(df))
 df$F1[df$soap_access=="buckets_with_taps"]<-0
@@ -254,8 +255,6 @@ df$F2[df$hand_washing_facility=="no_specific"]<-1
 
 df$F3<- rep(NA, nrow(df))
 df$F3[df$health_time=="less15"|df$health_time=="16_30"|df$health_time=="31_60"]<-1
-#df$F3[(df$health_time=="60_180"|df$health_time=="above180")&(df$health_transport=="car"|df$health_transport=="cart"|df$health_transport=="moto"|df$health_transport=="bus")]<-1
-#35 households with 0 instead NA for following version:
 df$F3[df$health_transport=="car"|df$health_transport=="cart"|df$health_transport=="moto"|df$health_transport=="bus"]<-1
 df$F3[(df$health_transport=="walking"|df$health_transport=="have_not"|df$health_transport=="treatment_toofar") & (df$health_time=="60_180"|df$health_time=="above180")]<-4
 
@@ -283,10 +282,10 @@ df$F6[df$SD>2.5]<-4
 #df$chronic_illness_hh_members.female_13
 
 ####################################################################################################################################################################################################################################################################################################
-######LIVING STANDARD & COPING GAPS#################################################################################################################################################################################################################################################################
+######LIVING STANDARD & COPING GAPS [LSG's & CG's]##################################################################################################################################################################################################################################################
 ####################################################################################################################################################################################################################################################################################################
 
-######education######################################################################################################
+######education#######################################################################################################################################################
 
 df$G1<- rep(NA, nrow(df))
 df$G1[df$HH_schoolaged_children==df$enrollement_note]<-1
@@ -337,7 +336,7 @@ df$G11[df$HH_schoolaged_children>0 & df$school_barrier_girls_note.security_conce
 #G12 not scored: df$cash_education (all dummies)
 #G13 not scored: df$home_learning (all dummies)
 
-######health######################################################################################################
+######health##########################################################################################################################################################
 
 df$H1<- rep(NA, nrow(df))
 df$H1[df$health_household.none==1]<-1
@@ -387,7 +386,7 @@ df$H10[df$barriers_health.medical_refused==1 | df$barriers_health.no_pwd==1]<-4
 
 #H11 not scored: df$cash_health (all dummies)
 
-######nutrition######################################################################################################
+######nutrition#######################################################################################################################################################
 
 df$I1<- rep(NA, nrow(df))
 df$I1[df$unusually_sleepy=="no" & df$child_fever=="no"]<-1
@@ -418,7 +417,7 @@ df$I6[df$nutrition_barriers.unaware_services==1 | df$nutrition_barriers.unaware_
 df$I6[df$nutrition_barriers.difficulty==1 | df$nutrition_barriers.facilities==1 | df$nutrition_barriers.prohibitive==1 ]<-3
 df$I6[df$nutrition_barriers.insecurity==1 | df$nutrition_barriers.inaccessible==1 | df$nutrition_barriers.inaccessible_clans==1 ]<-4
 
-######food security######################################################################################################
+######food security###################################################################################################################################################
 
 df$J1<- rep(NA, nrow(df))
 df$J1[df$main_source_food.purchased_market==1 | df$main_source_food.own_cultivation==1 | df$main_source_food.own_livestock==1]<-1
@@ -443,13 +442,93 @@ df$J4[df$market_time=="less15"|df$market_time=="min_15_29"|df$market_time=="min_
 df$J4[df$market_transport=="car"|df$market_transport=="cart"|df$market_transport=="moto"|df$market_transport=="bus"]<-0
 df$J4[(df$market_transport=="walking") & (df$market_time=="hr_1_2"|df$market_time=="more2h")]<-1
 
-######Water Sanitation & Hygiene [WASH] ############################################################################################
+######water sanitation & hygiene [WASH] ##############################################################################################################################
+
+df$K1<- rep(NA, nrow(df))
+df$K1[(df$water_source_time=="water_premises" | df$water_source_time=="less_5_min" | df$water_source_time=="between_and_15_min" |df$water_source_time=="between_and_30_min") & (df$water_source=="public_tap" | df$water_source=="handpumps_Handpump"| df$water_source=="protected_well"| df$water_source=="piped_neighbors"| df$water_source=="protected_Protected"| df$water_source=="bottled_water"| df$water_source=="private_tap")]<-1
+df$K1[df$water_source_time=="more_31min"| df$water_source=="unprotected_well" | df$water_source=="water_seller"| df$water_source=="unprotected_spring"| df$water_source=="rain_water"| df$water_source=="tanker_Tanker"]<-3
+df$K1[df$water_source=="surface_dam"]<-"4+"
+
+df$K2<- rep(NA, nrow(df))
+df$K2[df$enough_water.drinking==1]<-1
+df$K2[df$enough_water.drinking==0]<-4
+
+df$K3<- rep(NA, nrow(df))
+df$K3[df$enough_water.drinking==1 & df$enough_water.cooking==1 & df$enough_water.personal_hygiene_==1 & df$enough_water.other__domestic_purposes_==1 & df$enough_water.not_enough_water_==0]<-0
+df$K3[df$enough_water.other__domestic_purposes_==0 | df$enough_water.personal_hygiene_==0 | df$enough_water.cooking==0]<-1
+df$K3[which(df$enough_water.not_enough_water_==1 & (df$enough_water.drinking==1 | df$enough_water.cooking==1 | df$enough_water.personal_hygiene_==1 | df$enough_water.other__domestic_purposes_==1))]<-NA
+#ran into issues, see above, 244 survey getting NA due to inconsistency and see below:
+#which(is.na(df$K3)&df$enough_water.not_enough_water_==0)         #75 NA surveys no drinking water, covered by K2
+
+df$K4<- rep(NA, nrow(df))
+df$K4[df$sanitation_facility=="flush_toilet"| df$sanitation_facility=="pit_latrine_with"| df$sanitation_facility=="pit_VIP" ]<-1
+df$K4[df$sanitation_facility=="pit_latrine_without" | df$sanitation_facility=="open_hole"| df$sanitation_facility=="other" | df$no_toilet>3]<-3
+df$K4[df$sanitation_facility=="none_of"]<-4
+
+df$K5<- rep(NA, nrow(df))
+df$K5[df$soap_access=="yes"]<-0
+df$K5[df$soap_access=="no"]<-1
+
+df$K6<- rep(NA, nrow(df))
+df$K6[(df$latrine_features.door + df$latrine_features.access + df$latrine_features.walls_ + df$latrine_features.inside + df$latrine_features.lock + df$latrine_features.outside + df$latrine_features.close + df$latrine_features.marked + df$latrine_features.soap)>6]<-0
+df$K6[(df$latrine_features.door + df$latrine_features.access + df$latrine_features.walls_ + df$latrine_features.inside + df$latrine_features.lock + df$latrine_features.outside + df$latrine_features.close + df$latrine_features.marked + df$latrine_features.soap)<7]<-1
+
+df$K7<- rep(NA, nrow(df))
+df$K7[df$waste_disposal=="covered_pit" | df$waste_disposal=="burial"]<-0
+df$K7[df$waste_disposal=="burning" | df$waste_disposal=="In_open"]<-1
+
+df$K8<- rep(NA, nrow(df))
+df$K8[df$water_barrier.no_problem==1]<-1
+df$K8[df$water_barrier.water_expensive==1 | df$water_barrier.not_water==1]<-2
+df$K8[df$water_barrier.water_market==1 | df$water_barrier.insufficient_points.==1 | df$water_barrier.water_close==1 | df$water_barrier.waterpoints_far==1 | df$water_barrier.don_water==1]<-3
+df$K8[df$water_barrier.waterpoints_disabilities==1 | df$water_barrier.some_waterpoints==1]<-4
+df$K8[df$water_barrier.fetching_activity==1]<-"4+"
+
+df$K9<- rep(NA, nrow(df))
+df$K9[df$of_water.doesn_t_have_issue==1]<-1
+df$K9[df$of_water.less_preferred_cooking==1 | df$of_water.surface_water_cooking==1| df$of_water.unsual_source==1]<-2
+df$K9[df$of_water.rely_less_preferred==1 | df$of_water.dangerious_other==1]<-3
+df$K9[df$of_water.or_credit_for==1 | df$of_water.consumption_less==1]<-4
+df$K9[df$of_water.surface_water==1| df$of_water.send_children_water==1 | df$of_water.dangerious_source==1 ]<-"4+"
+
+df$K10<- rep(NA, nrow(df))
+df$K10[df$sanitation_barriers.no_problem==1]<-1
+df$K10[df$sanitation_barriers.lack_crowded==1 | df$sanitation_barriers.sanitation_unhygienic==1]<-2
+df$K10[df$sanitation_barriers.sanitation_full==1 | df$sanitation_barriers.sanitation_far==1]<-3
+df$K10[df$sanitation_barriers.sanitation_disabilities==1 | df$sanitation_barriers.some_toilets==1 | df$sanitation_barriers.sanitation_women==1 | df$sanitation_barriers.sanitation_etc==1]<-4
+df$K10[df$sanitation_barriers.going_dangerous==1]<-"4+"
+#df[which(is.na(df$K10) & df$sanitation_barriers.other==0 & df$sanitation_barriers.don_know==0), 488:500]
+
+df$K11<- rep(NA, nrow(df))
+df$K11[df$sanitation_coping.no_problem==1]<-1
+df$K11[df$sanitation_coping.less_prefered_toilets==1]<-2
+df$K11[df$sanitation_coping.latrines_toilets==1]<-3
+df$K11[df$sanitation_coping.usual_one==1 | df$sanitation_coping.dangerous_place==1 | df$sanitation_coping.at_night==1]<-4
+df$K11[df$sanitation_coping.plastic_bag==1 | df$sanitation_coping.the_open==1]<-"4+"
+#df[which(is.na(df$K11) & (!is.na(df$sanitation_coping.plastic_bag)) & df$sanitation_coping.don_know!=1 & df$sanitation_coping.other!=1), 502:515]
+
+df$K12<- rep(NA, nrow(df))
+df$K12[df$hygeine_coping.any_issue==1]<-1
+df$K12[df$hygeine_coping.rely_less_preferred==1 | df$hygeine_coping.buying_at_further==1]<-2
+df$K12[df$hygeine_coping.rely_soap_substitutes==1 | df$hygeine_coping.borrow_from_relative==1 | df$hygeine_coping.spend_or_used==1 | df$hygeine_coping.reduce_consumption_consumption==1 | df$hygeine_coping.reduce_consumption_cleaning==1]<-3
+df$K12[df$hygeine_coping.buying_at_dangerious==1 ]<-"4+"
+
+df$K13<- rep(NA, nrow(df))
+df$K13[df$menstrual_barriers.no_problem==1]<-0
+df$K13[df$menstrual_barriers.no_access==1 | df$menstrual_barriers.no_money==1]<-1
+
+#K14 not scored: df$hand_washing_times (all dummies)
+
+######shelter & non-food items [SNFI]#################################################################################################################################
 
 
 
 
 
 
+######protection######################################################################################################################################################
+
+######accountability to affected people [AAP]#########################################################################################################################
 
 ######################Pregancy issue###############################################################################################
 incon30<-(df$pregnancy=="yes" & (df$females_16_17+df$females_13_15+df$females_18_40+df$females_41_59)==0)
