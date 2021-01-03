@@ -13,6 +13,72 @@ dot_multiples<-function(x,y){
   print(choice_var)
 }
 
+agg_binary<-function(x){
+  for (i in 1:dim(x)[2])                                                            #loop over all columns in non-critical data frame
+  {
+    if (length(which(x[i]==0))==0){                                                 #if not binary coded:
+    x[i][(x[i]==1 | x[i]==2) & (!is.na(x[i]))]<-0                                   #recode 1&2 (if not NA) to 0
+    x[i][(x[i]==3 | x[i]==3 | x[i]==4 | x[i]=="4+" )& (!is.na(x[i]))]<-1            #recode 3 &4 & 4+ (if not NA) to 1
+    } 
+    #print(names(x[i]))                                                              #for debugging
+    #print(table(x[i]))                                                              #for debugging
+  }
+  
+  agg_score<-rep(NA, dim(x)[1])                                                     #initiate variable
+  
+  for (j in 1:dim(x)[1]){                                                           #loop over all rows in non-critical data frame
+  ratio<- round((sum(x[j,], na.rm=T) / length(which(!is.na(x[j,])))), digits=2)     #calculate ratio of 1 scored indicators from all possible scored indicators (exclude NA)
+  #print(ratio)                                                                     #for debugging
+    if (is.na(ratio)){                                                              #if ratio NA
+      agg_score[j]<-NA                                                              #make score NA 
+    }
+      else{
+        if (ratio<=0.33){                                                           #score 1 if ratio smaller or equal 33%
+          agg_score[j]<-1
+        }
+          else{ 
+            if (ratio<=0.66){                                                       #score 2 if ratio bigger 33% and smaller or equal 66%
+              agg_score[j]<-2
+            }
+              else{                                                                 #score 3 if ratio bigger 66%
+                agg_score[j]<-3
+              }
+          }
+        }
+      }
+    return(agg_score)
+}
+      
+    
+
+agg_LSGs<-function(x,y){
+  y[y=="4+"]<-5                                                                     #recode 4+ to 5
+  for (i in 1:dim(y)[2]){
+    if (length(which(y[i]==0))!=0)                                                  #loop over columns of critical indicators
+    {print(paste0("Warning:binary scored:",names(y[i])))                            
+    }
+    y[,i]<-as.numeric(y[,i])                                                        #make all columns numeric (issues due to 4+)
+  }
+  agg_score<-as.numeric(agg_binary(x))                                              #get overall score from non-critical indicators
+  sectoral_df<-data.frame(y, agg_score)                                             #make data frame out of the aggregated non-citical and critical indicators
+  sectoral_df[is.na(sectoral_df)]<-0                                                #recode NA to 0 (causing issues if one row has only NA)
+  sectoral_agg<-rep(NA, dim(x)[1])                                                  #initiate variable
+    for (j in 1:dim(x)[1]){                                                         #loop over all households
+      sectoral_agg[j]<-max(sectoral_df[j,], na.rm=T)                                #take max 
+    }
+  sectoral_agg[sectoral_agg==5]<-"4+" 
+  sectoral_agg[sectoral_agg==0]<-NA                                                 #recode 0 to NA
+  return(sectoral_agg)                                                              #recode 5 to 4+
+}
+
+
+#df_G_crit[df_G_crit=="4+"]<-5
+#sectoral_df<-data.frame(df_G_crit, agg_binary(df_G_bin))
+#for (j in 1:dim(sectoral_df)[2]){
+#  sectoral_df[,j]<-as.numeric(sectoral_df[,j])
+#}
+#for (i in 1:dim(df)[1]){
+#  max(sectoral_df[i,], na.rm=T)}
 
 ####################################################################################################################################################################################################################################################################################################
 ######NEW VARIABLES TO HELP CALCULATE SCORES########################################################################################################################################################################################################################################################
@@ -375,6 +441,15 @@ df$G11[df$HH_schoolaged_children>0 & df$school_barrier_girls_note.security_conce
 #G12 not scored: length(dot_multiples("cash_education[.]",df))
 #G13 not scored: length(dot_multiples("home_learning[.]",df))
 
+
+#____________________________aggregate to sectoral LSG____________________________
+
+df_G_bin<-data.frame(df$G5, df$G6, df$G7)
+df_G_crit<-data.frame(df$G1, df$G10, df$G11)
+LSG_education<-agg_LSGs(df_G_bin,df_G_crit)
+
+#_________________________________________________________________________________
+
 ######health##########################################################################################################################################################
 
 df$H1<- rep(NA, nrow(df))
@@ -404,9 +479,9 @@ df$H6[df$birth_where=="doctor" | df$birth_where=="nurse" | df$birth_where=="heal
 df$H6[df$birth_where=="respondent_s" | df$birth_where=="other_home" ]<-1
 
 df$H7<- rep(NA, nrow(df))
-df$H7[df$who_assist=="government_hospital" | df$who_assist=="government_clinic" | df$who_assist=="other_health" | df$who_assist=="traditional" | df$who_assist=="community"]<-0
-df$H7[df$who_assist=="relative" | df$who_assist=="other" ]<-1
-
+df$H7[df$who_assist=="government_hospital" | df$who_assist=="government_clinic" | df$who_assist=="other_health" | df$who_assist=="traditional" | df$who_assist=="community"]<-1
+df$H7[df$who_assist=="relative" | df$who_assist=="other" ]<-3
+df$H7[df$who_assist=="no" ]<-4
 
 df$H8<- rep(NA, nrow(df))
 df$H8[df$health_time=="less15"|df$health_time=="16_30"|df$health_time=="31_60"]<-1
@@ -424,6 +499,14 @@ df$H10[df$barriers_health.cost_high==1 | df$barriers_health.problems_civil==1 | 
 df$H10[df$barriers_health.medical_refused==1 | df$barriers_health.no_pwd==1]<-4
 
 #H11 not scored: length(dot_multiples("cash_health[.]",df))
+
+#____________________________aggregate to sectoral LSG____________________________
+
+df_H_bin<-data.frame(df$H2, df$H3, df$H4, df$H5, df$H6, df$H10)
+df_H_crit<-data.frame(df$H1, df$H7, df$H8)
+LSG_health<-agg_LSGs(df_H_bin,df_H_crit)
+
+#_________________________________________________________________________________
 
 ######nutrition#######################################################################################################################################################
 
@@ -742,6 +825,17 @@ df$N7[df$aid_barriers.insecure_route==1 |df$aid_barriers.insecure_site==1 | df$a
 #O4: not scored: length(dot_multiples("why_no_action[.]",df))
 #O5: not scored: length(dot_multiples("signs_covid[.]",df))
 #O6: not scored: length(dot_multiples("hh_covid_action[.]",df))
+
+####################################################################################################################################################################################################################################################################################################
+######AGGREGATION###################################################################################################################################################################################################################################################################################
+####################################################################################################################################################################################################################################################################################################
+
+####################################################################################################################################################################################################################################################################################################
+######EXPORT########################################################################################################################################################################################################################################################################################
+####################################################################################################################################################################################################################################################################################################
+
+
+write.csv(df,"output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored.csv", row.names=FALSE)
 
 ######################Pregancy issue###############################################################################################
 incon30<-(df$pregnancy=="yes" & (df$females_16_17+df$females_13_15+df$females_18_40+df$females_41_59)==0)
