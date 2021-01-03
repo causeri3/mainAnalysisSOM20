@@ -4,6 +4,16 @@ setwd("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/GitHub/mainAnalysisSOM20"
 df<-read.csv(file="input/REACH_SOM2006_JMCNA_IV_Data-Set_August2020_October_27_2020.csv", head=T, dec=".", sep=",",na.strings=c("NA",""," "))
 raw<-read.csv(file="C:/Users/Vanessa Causemann/Desktop/REACH/Data/REACH_SOM2006_JMCNA_IV_Data-Set_August2020_October_27_2020_RAW.csv", head=T, dec=".", sep=",")
 
+
+######FUNCTION######################################################################################################################################################################################################################################################################################
+
+#get all dummy multiples, by their stacked character variable, i.e. dot_multiples("market_goods", df) or dot_multiples("market_goods[.]",df) to only get the binaries
+dot_multiples<-function(x,y){
+  choice_var<-grep(x, names(y), value = TRUE)
+  print(choice_var)
+}
+
+
 ####################################################################################################################################################################################################################################################################################################
 ######NEW VARIABLES TO HELP CALCULATE SCORES########################################################################################################################################################################################################################################################
 ####################################################################################################################################################################################################################################################################################################
@@ -14,12 +24,41 @@ adultish <- (df$females_16_17 + df$males_16_17 + df$females_18_40 + df$males_18_
 df$today<-as.Date(df$today-1, origin = '1900-01-01')                                          #because of Excel formatting
 days_displaced<-df$today - as.Date(df$left_aoo, "%d/%m/%Y")
 
-#for adding and substracting: data set with 0's instead of NA's
+#for adding and subtracting: data set with 0's instead of NA's
 df_nona<-df
 df_nona[is.na(df_nona)]=0
 
 #SD: Shelter Density
 df$SD<-df$hh_size/(df$sum_rooms-(df_nona$kitchens+df_nona$toilets))
+
+df$no_nfi_items<-(df$nfi_access.wintting_blankets+
+                    df$nfi_access.mattting_mats+
+                    df$nfi_access.cookting_utensils+
+                    df$nfi_access.cookting_fuel+
+                    df$nfi_access.wateting_containers+
+                    df$nfi_access.jerrting_can+
+                    df$nfi_access.Torches+
+                    df$nfi_access.solating_lamps+
+                    df$nfi_access.solating_panels+
+                    df$nfi_access.Generators+
+                    df$nfi_access.Batteries+
+                    df$nfi_access.Clothing+
+                    df$nfi_access.wintting_clothing+
+                    df$nfi_access.Shoes+
+                    df$nfi_access.wintting_shoes+
+                    df$nfi_access.wintting_heaters+
+                    df$nfi_access.heatting_fuel+
+                    df$nfi_access.dispting_diapers+
+                    df$nfi_access.saniting_pads+
+                    df$nfi_access.Soap+
+                    df$nfi_access.washting_powder+
+                    df$nfi_access.cleating_house+
+                    df$nfi_access.deteting_dishes+
+                    df$nfi_access.hygiting_kits+
+                    df$nfi_access.handting_sanitiser+
+                    df$nfi_access.faceting_masks+
+                    df$nfi_access.dispting_gloves+
+                    df$nfi_access.mosqting_Nets)
 
 ######FSC-Indicators##################################################################################################################################################
 
@@ -241,7 +280,7 @@ df$E1<- rep(NA, nrow(df))
 df$E1[df$factors_aid.None==1]<-0
 df$E1[df$factors_aid.30.==1|df$factors_aid.60.==1|df$factors_aid.Disability._Person_living_with_a_disability==1|df$factors_aid.Heritage._A_member_of_a_minority_or_marginalised_community==1]<-1
 
-#E2 not scored: df$services_affected (all dummies: df$services_affected.access_remedies df$services_affected.security df$services_affected.health df$services_affected.education df$services_affected.water df$services_affected.food df$services_affected.cash df$services_affected.work df$services_affected.other)
+#E2 not scored: length(dot_multiples("services_affected[.]",df))[df$services_affected.access_remedies df$services_affected.security df$services_affected.health df$services_affected.education df$services_affected.water df$services_affected.food df$services_affected.cash df$services_affected.work df$services_affected.other]
 
 ######COVID-related###################################################################################################################################################
 
@@ -296,7 +335,7 @@ df$G2<- rep(NA, nrow(df))
 df$G2[df$HH_schoolaged_children!=0 & df$covid_enrollement==0]<-0
 df$G2[df$covid_enrollement>0]<-1
 
-#G3 not scored: df$attend_covid19 (all dummies: df$attend_covid19.children_stay_home df$attend_covid19.no_teachers df$attend_covid19.lack_transport df$attend_covid19.parent_stay_home df$attend_covid19.school_closed df$attend_covid19.other df$attend_covid19.no_answer)
+#G3 not scored: length(dot_multiples("attend_covid19[.]",df)) [df$attend_covid19.children_stay_home df$attend_covid19.no_teachers df$attend_covid19.lack_transport df$attend_covid19.parent_stay_home df$attend_covid19.school_closed df$attend_covid19.other df$attend_covid19.no_answer]
 
 df$G4<- rep(NA, nrow(df))
 df$G4[df$HH_schoolaged_children>0 & df$enrollement_note2<1]<-1
@@ -316,8 +355,8 @@ df$G7<- rep(NA, nrow(df))
 df$G7[df$HH_schoolaged_children>0 & df$HH_schoolaged_children==df$remote_education]<-0
 df$G7[df$HH_schoolaged_children>0 & df$HH_schoolaged_children>df$remote_education]<-1
 
-#G8 not scored: df$remote_edu_via (all dummies)
-#G9 not scored: df$school_material (all dummies)
+#G8 not scored: length(dot_multiples("remote_edu_via[.]",df))
+#G9 not scored: length(dot_multiples("school_material[.]",df))
 
 df$G10<- rep(NA, nrow(df))
 df$G10[df$HH_schoolaged_children>0 & (df$school_barrier_note.no_barriers==1| df$school_barrier_note.other==1)]<-1
@@ -333,8 +372,8 @@ df$G11[df$HH_schoolaged_children>0 & (df$school_barrier_girls_note.schools_close
 df$G11[df$HH_schoolaged_children>0 & (df$school_barrier_girls_note.no_school==1| df$school_barrier_girls_note.discrimination_enroll==1 | df$school_barrier_girls_note.cannot_go==1| df$school_barrier_girls_note.chores==1)]<-4
 df$G11[df$HH_schoolaged_children>0 & df$school_barrier_girls_note.security_concerns==1]<-"4+"
 
-#G12 not scored: df$cash_education (all dummies)
-#G13 not scored: df$home_learning (all dummies)
+#G12 not scored: length(dot_multiples("cash_education[.]",df))
+#G13 not scored: length(dot_multiples("home_learning[.]",df))
 
 ######health##########################################################################################################################################################
 
@@ -384,7 +423,7 @@ df$H10[df$barriers_health.lack_staff==1 | df$barriers_health.public_not_open==1]
 df$H10[df$barriers_health.cost_high==1 | df$barriers_health.problems_civil==1 | df$barriers_health.public_clinic==1 | df$barriers_health.treatment_toofar==1 | df$barriers_health.no_medicine==1 | df$barriers_health.no_treament==1]<-3
 df$H10[df$barriers_health.medical_refused==1 | df$barriers_health.no_pwd==1]<-4
 
-#H11 not scored: df$cash_health (all dummies)
+#H11 not scored: length(dot_multiples("cash_health[.]",df))
 
 ######nutrition#######################################################################################################################################################
 
@@ -505,7 +544,7 @@ df$K11[df$sanitation_coping.less_prefered_toilets==1]<-2
 df$K11[df$sanitation_coping.latrines_toilets==1]<-3
 df$K11[df$sanitation_coping.usual_one==1 | df$sanitation_coping.dangerous_place==1 | df$sanitation_coping.at_night==1]<-4
 df$K11[df$sanitation_coping.plastic_bag==1 | df$sanitation_coping.the_open==1]<-"4+"
-#df[which(is.na(df$K11) & (!is.na(df$sanitation_coping.plastic_bag)) & df$sanitation_coping.don_know!=1 & df$sanitation_coping.other!=1), 502:515]
+#df[which(is.na(df$K11) & (!is.na(df$sanitation_coping.plastic_bag)) & df$sanitation_coping.don_know!=1 & df$sanitation_coping.other!=1), 502:512]
 
 df$K12<- rep(NA, nrow(df))
 df$K12[df$hygeine_coping.any_issue==1]<-1
@@ -517,18 +556,192 @@ df$K13<- rep(NA, nrow(df))
 df$K13[df$menstrual_barriers.no_problem==1]<-0
 df$K13[df$menstrual_barriers.no_access==1 | df$menstrual_barriers.no_money==1]<-1
 
-#K14 not scored: df$hand_washing_times (all dummies)
+#K14 not scored: length(dot_multiples("hand_washing_times[.]",df))
 
 ######shelter & non-food items [SNFI]#################################################################################################################################
 
+df$L1<- rep(NA, nrow(df))
+df$L1[df$SD<=1]<-1
+df$L1[1<df$SD & df$SD <=2]<-2
+df$L1[2<df$SD & df$SD <=2.5]<-3
+df$L1[df$SD>2.5]<-4
 
+df$L2<- rep(NA, nrow(df))
+df$L2[df$shelter_type=="brick" | df$shelter_type=="stone" |df$shelter_type=="normal house"]<-1
+df$L2[df$shelter_type=="cgi" | df$shelter_type=="mud" | df$shelter_type=="collective" | (df$shelter_type=="buul" & df$idp_settlement=="no")| df$shelter_type=="stick"| df$shelter_type=="timer_"]<-2
+df$L2[df$shelter_type=="unfinished" | df$shelter_type=="tent"]<-3
+df$L2[(df$shelter_type=="buul" & df$idp_settlement=="yes") | df$shelter_type=="makeshift" ]<-4
+df$L2[(is.na(df$shelter_type) & df$hh_shelter==0) | df$shelter_type=="none" ]<-"4+"
 
+df$L3<- rep(NA, nrow(df))
+df$L3[df$lack_enclosure.none_of==1 | df$lack_enclosure.leaks_light_rain==1 | df$lack_enclosure.limited_room==1 | df$lack_enclosure.presence_removable==1]<-0
+df$L3[df$lack_enclosure.lack_insulation==1 | df$lack_enclosure.leaks_heavy_rain==1 | df$lack_enclosure.presence_debris==1 ]<-1
 
+df$L4<- rep(NA, nrow(df))
+df$L4[df$shelter_damage.none_of==1 |df$shelter_damage.opening_cracks==1 | df$shelter_damage.broken_or==1 | df$shelter_damage.some_in==1 | df$shelter_damage.damaged_Damage==1  | df$shelter_damage.foundation_damaged==1| df$shelter_damage.gas_sewage==1 | df$shelter_damage.electricity_and==1  | df$shelter_damage.other==1]<-1
+df$L4[df$shelter_damage.roof_Roof==1 | df$shelter_damage.exterior_to==1 | df$shelter_damage.exterior_or==1 | df$shelter_damage.large_in==1 | df$shelter_damage.total_Total==1 | df$shelter_damage.some_walls==1]<-3
+df$L4[df$shelter_damage.severe_unsafe==1]<-4
+#df[which(is.na(df$L4)&df$shelter_damage.not_sure!=1),557:574]
 
+#L5: not scored: length(dot_multiples("unable_repair[.]",df)) 
+
+df$L6<- rep(NA, nrow(df))
+df$L6[df$shelter_issues.none==1 |df$shelter_issues.unable_home==1 | df$shelter_issues.other==1 ]<-0
+df$L6[df$shelter_issues.lack_partitions==1 |df$shelter_issues.lack_inside==1 | df$shelter_issues.cooking_are==1 | df$shelter_issues.lack_per==1 | df$shelter_issues.lack_around==1  | df$shelter_issues.bathing_are==1| df$shelter_issues.lack_bathing==1 | df$shelter_issues.lack_cooking==1  | df$shelter_issues.theft==1| df$shelter_issues.other_security==1 | df$shelter_issues.fire==1  | df$shelter_issues.poor_of==1]<-1
+
+#L7: not scored: df$hh_cook
+
+df$L8<- rep(NA, nrow(df))
+df$L8[df$occupancy_arrangement=="ownership" | df$occupancy_arrangement=="rented" |df$occupancy_arrangement=="hosted"]<-0
+df$L8[df$occupancy_arrangement=="no_occu" | df$occupancy_arrangement=="other" ]<-1
+
+df$L9<- rep(NA, nrow(df))
+df$L9[df$written_documentation=="yes" ]<-0
+df$L9[df$written_documentation=="no"]<-1
+
+df$L10<- rep(NA, nrow(df))
+df$L10[df$hlp_problems.disputes_tenant==1 |df$hlp_problems.rules_clear==1 | df$hlp_problems.none==1  | df$hlp_problems.inheritance_issues==1]<-0
+df$L10 [df$hlp_problems.lack_documents==1 |df$hlp_problems.looting_property==1 | df$hlp_problems.threat_others==1 | df$hlp_problems.disputed_ownership==1 | df$hlp_problems.property_occupation==1  | df$hlp_problems.other==1]<-1
+df$L10[which(df$hlp_problems.none==1 & df$hlp_problems.not_sure==1)]<-NA
+
+df$L11<- rep(NA, nrow(df))
+df$L11[df$no_nfi_items==28]<-1
+df$L11[df$no_nfi_items<28 & df$no_nfi_items>4]<-2
+df$L11[df$no_nfi_items==4]<-3
+df$L11[df$no_nfi_items<4]<-4
+no_nfi_items
+
+#L12: not scored: length(dot_multiples("shetler_support[.]",df))
+
+#df$shetler_support.beddting_items
+#df$shetler_support.wintting_blankets
+#df$shetler_support.mattting_mats
+#df$shetler_support.cookting_utensils
+#df$shetler_support.cookting_fuel
+#df$shetler_support.wateting_containers
+#df$shetler_support.jerrting_can
+#df$shetler_support.Torches
+#df$shetler_support.solating_lamps
+#df$shetler_support.solating_panels
+#df$shetler_support.Generators
+#df$shetler_support.Batteries
+#df$shetler_support.Clothing
+#df$shetler_support.wintting_clothing
+#df$shetler_support.Shoes
+#df$shetler_support.wintting_shoes
+#df$shetler_support.wintting_heaters
+#df$shetler_support.heatting_fuel
+#df$shetler_support.dispting_diapers
+#df$shetler_support.saniting_pads
+#df$shetler_support.Soap
+#df$shetler_support.washting_powder
+#df$shetler_support.cleating_house
+#df$shetler_support.deteting_dishes
+#df$shetler_support.hygiting_kits
+#df$shetler_support.hygiting_kits
+#df$shetler_support.faceting_masks
+#df$shetler_support.dispting_gloves
+#df$shetler_support.mosqting_Nets
 
 ######protection######################################################################################################################################################
 
-######accountability to affected people [AAP]#########################################################################################################################
+df$M1<- rep(NA, nrow(df))
+df$M1[df$child_labor_note=="no"]<-0
+df$M1[df$child_labor_note=="yes"]<-1
+
+df$M2<- rep(NA, nrow(df))
+df$M2[df$children_away=="no"]<-1
+df$M2[df$child_study>0 | df$child_employment>0]<-2
+df$M2[df$child_married>0]<-3
+df$M2[df$child_armed>0 | df$child_abducted>0 | df$child_missing>0 | df$child_detained>0]<-"4+"
+#df[which(is.na(df$M2) & df$children_away!="dontknow"), 720:735]
+
+df$M3<- rep(NA, nrow(df))
+df$M3[df$hh_restrictions.no==1]<-1
+df$M3[df$hh_restrictions.yes_3==1]<-3
+df$M3[df$hh_restrictions.yes_2==1]<-4
+df$M3[df$hh_restrictions.yes_1==1]<-"4+"
+df$M3[df$hh_restrictions.not_tried==1]<-NA
+#df[which(!is.na(df$M3) & df$hh_restrictions.not_tried==1),  731:737]
+
+df$M4<- rep(NA, nrow(df))
+df$M4[df$not_safe_boys=="no"]<-1
+df$M4[df$not_safe_boys=="yes"]<-"4+"
+
+#M5: not scored: length(dot_multiples("where_not_safe_boys[.]",df))
+
+df$M6<- rep(NA, nrow(df))
+df$M6[df$not_safe_girls=="no"]<-1
+df$M6[df$not_safe_girls=="yes"]<-"4+"
+
+#M7: not scored: length(dot_multiples("where_not_safe_girls[.]",df))
+
+df$M8<- rep(NA, nrow(df))
+df$M8[df$hh_incidents=="no"]<-0
+df$M8[df$hh_incidents=="yes"]<-1
+
+df$M9<- rep(NA, nrow(df))
+df$M9[df$child_friendly=="yes"]<-0
+df$M9[df$child_friendly=="no"]<-1
+
+df$M10<- rep(NA, nrow(df))
+df$M10[df$medical_services=="yes"]<-0
+df$M10[df$medical_services=="no"]<-1
+
+df$M11<- rep(NA, nrow(df))
+df$M11[df$gbv_incidents=="no"]<-1
+df$M11[df$gbv_incidents=="yes"]<-4
+
+df$M12<- rep(NA, nrow(df))
+df$M12[df$medical_services=="yes"]<-0
+df$M12[df$medical_services=="no"]<-1
+
+####################################################################################################################################################################################################################################################################################################
+######ACCOUNTABILITY TO AFFECTED PEOPLE [AAP] & COVID-INFO##########################################################################################################################################################################################################################################
+####################################################################################################################################################################################################################################################################################################
+
+######AAP#############################################################################################################################################################
+
+#N1: not scored: length(dot_multiples("phone_type[.]",df))
+
+df$N2<- rep(NA, nrow(df))
+df$N2[df$read_write=="yes_without"| df$read_write=="yes_some"]<-0
+df$N2[df$read_write=="yes_alot"| df$read_write=="no"]<-1
+
+#N3: not scored: table(df$aid_received)
+#N4: not scored: table(df$information_channel)
+#N5: not scored: table(df$aid_satisfaction)
+
+df$N6<- rep(NA, nrow(df))
+df$N6[df$aid_access=="no"]<-0
+df$N6[df$aid_access=="yes"]<-1
+
+df$N7<- rep(NA, nrow(df))
+df$N7[df$aid_barriers.lack_information==1 |df$aid_barriers.physical_access==1 | df$aid_barriers.other==1]<-0
+df$N7[df$aid_barriers.insecure_route==1 |df$aid_barriers.insecure_site==1 | df$aid_barriers.exclusion_gatekeepers==1]<-1
+#df[which(is.na(df$N7) & (!is.na(df$aid_barriers.exclusion_gatekeepers))),830:835]
+
+#N8: not scored: table(df$trust_aid_workers)
+#N9: not scored: table(df$feedback_mechanisms)
+#N10: not scored: length(dot_multiples("prefer_feedback_channel[.]",df))
+#N11: not scored: length(dot_multiples("humanitarian_assistance[.]",df))
+#N12: not scored: table(df$note_households_support), all NA
+#N13: not scored: table(df$first_priority)
+#N14: not scored: table(df$second_priority)
+#N15: not scored: table(df$third_priority)
+#N16: not scored: table(df$un_continue)
+#N17: not scored: table(df$un_stop)
+#N18: not scored: length(dot_multiples("factors_aid[.]",df))
+#N18: not scored: length(dot_multiples("services_affected[.]",df))
+
+######COVID#############################################################################################################################################################
+
+#O1: not scored: length(dot_multiples("trust_covidinfo[.]",df))
+#O2: not scored: length(dot_multiples("prefer_covidinfo[.]",df))
+#O3: not scored: length(dot_multiples("action_to_prevent[.]",df))
+#O4: not scored: length(dot_multiples("why_no_action[.]",df))
+#O5: not scored: length(dot_multiples("signs_covid[.]",df))
+#O6: not scored: length(dot_multiples("hh_covid_action[.]",df))
 
 ######################Pregancy issue###############################################################################################
 incon30<-(df$pregnancy=="yes" & (df$females_16_17+df$females_13_15+df$females_18_40+df$females_41_59)==0)
