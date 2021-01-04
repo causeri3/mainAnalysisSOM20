@@ -14,20 +14,22 @@ koboquestions <- read.csv("input/questions.csv", header = T, stringsAsFactors = 
 dependent.variable<-names(df)[992:dim(df)[2]]
 research.question<-rep(NA, length(dependent.variable))
 sub.research.question<-rep(NA, length(dependent.variable))
-repeat.for.variable<-rep("state", length(dependent.variable))
+repeat.for.variable<-rep(NA, length(dependent.variable))
+#independent.variable<-rep("settlement_type", length(dependent.variable))
 independent.variable<-rep(NA, length(dependent.variable))
-independent.variable.type<-rep("categorical", length(dependent.variable))
+#independent.variable.type<-rep("categorical", length(dependent.variable))
+independent.variable.type<-rep(NA, length(dependent.variable))
 dependent.variable.type<-rep("categorical", length(dependent.variable))
 hypothesis.type<-rep("direct_reporting", length(dependent.variable))
 
-dap_indicators_state<-data.frame(research.question,
-                                 sub.research.question,
-                                 repeat.for.variable,
-                                 independent.variable,
-                                 independent.variable.type,
-                                 dependent.variable,
-                                 dependent.variable.type,
-                                 hypothesis.type)
+dap_indicators<-data.frame(research.question,
+                           sub.research.question,
+                           repeat.for.variable,
+                           independent.variable,
+                           independent.variable.type,
+                           dependent.variable,
+                           dependent.variable.type,
+                           hypothesis.type)
 
 
 
@@ -63,10 +65,10 @@ questionnaire<-load_questionnaire(data = df,
                                   choices.label.column.to.use = "label::English")
 
 #test if all variable names fit
-#dap_indicators_state$dependent.variable %in% names(df)
+#dap_indicators$dependent.variable %in% names(df)
 
 #adapt naming to hypegrammaR-style
-dap_indicators_state$dependent.variable<-hypegrammaR:::to_alphanumeric_lowercase(dap_indicators_state$dependent.variable)
+dap_indicators$dependent.variable<-hypegrammaR:::to_alphanumeric_lowercase(dap_indicators$dependent.variable)
 
 ##############SKIP FUNCTIONS FOR DIRECT REPORTING#################################################################################################################################################
 
@@ -100,21 +102,19 @@ pval_table <- function(results, filename) {
 
 ##########GET RESULTS AND SAVE IN DIFFERENT FORMATS########################################################################################################################
 
-
 #######################################
 ##########REPEAT FOR NATIONAL##########
 #######################################
 
-dap_national<-dap_indicators_state
-dap_national$repeat.for.variable<-NA
+dap_national<-dap_indicators
 
 #results-function (can take very long)
 start_time <- Sys.time()                                                                                                                    #timer for fun
 list_of_results_indicators_national <-  from_analysisplan_map_to_output(df,
-                                                             analysisplan = dap_national,
-                                                             weighting = weight.function,
-                                                             cluster_variable_name = NULL,
-                                                             questionnaire = questionnaire, confidence_level = 0.90)
+                                                                        analysisplan = dap_national,
+                                                                        weighting = weight.function,
+                                                                        cluster_variable_name = NULL,
+                                                                        questionnaire = questionnaire, confidence_level = 0.90)
 end_time <- Sys.time()                                                                                                                      #timer
 end_time - start_time                                                                                                                       #timer
 #34 min for 15%, estimate 4h, was true
@@ -126,7 +126,6 @@ list_of_results_indicators_national %>% saveRDS("output/list_of_results_indicato
 #get table of results and save as csv
 big_table_indicators_national <- list_of_results_indicators_national$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
 write.csv(big_table_indicators_national, file= paste0("output/big_table_indicators_national.csv"), row.names=FALSE)
-
 
 #get table with p-values and F-statistic (if not only direct reporting)
 #pval_table(list_of_results_indicators_national$results, "output/list_of_results_indicators_hypo_national.csv")
@@ -143,9 +142,57 @@ hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_nation
                                                filename = "list_of_results_indicators_national.html")
 
 
+
+#######################################
+###REPEAT FOR NATIONAL [IDP/NON-IDP]###
+#######################################
+
+dap_national_settlement<-dap_indicators
+dap_national_settlement$independent.variable<-"settlement_type"
+dap_national_settlement$independent.variable.type<-"categorical"
+
+#results-function (can take very long)
+start_time <- Sys.time()                                                                                                                    #timer for fun
+list_of_results_indicators_national_settlement <-  from_analysisplan_map_to_output(df,
+                                                             analysisplan = dap_national_settlement,
+                                                             weighting = weight.function,
+                                                             cluster_variable_name = NULL,
+                                                             questionnaire = questionnaire, confidence_level = 0.90)
+end_time <- Sys.time()                                                                                                                      #timer
+end_time - start_time                                                                                                                       #timer
+#34 min for 15%, estimate 4h, was true
+
+#save results as R file and get it 
+list_of_results_indicators_national_settlement %>% saveRDS("output/list_of_results_indicators_national_settlement.RDS")
+#list_of_results_indicators_national_settlement <- readRDS("output/list_of_results_indicators_national_settlement.RDS")
+
+#get table of results and save as csv
+big_table_indicators_national_settlement <- list_of_results_indicators_national_settlement$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
+write.csv(big_table_indicators_national, file= paste0("output/big_table_indicators_national_settlement.csv"), row.names=FALSE)
+
+#get table with p-values and F-statistic (if not only direct reporting)
+#pval_table(list_of_results_indicators_national_settlement$results, "output/list_of_results_indicators_hypo_national_settlement.csv")
+
+#get html output
+hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_national_settlement,
+                                               render_result_with = hypegrammaR:::from_result_map_to_md_table,
+                                               by_analysisplan_columns = c("dependent.var","repeat.var.value"),
+                                               by_prefix =  c("",""),
+                                               level = 2,
+                                               questionnaire = questionnaire,
+                                               label_varnames = TRUE,
+                                               dir ="output",
+                                               filename = "list_of_results_indicators_national_settlement.html")
+
+
+
 #####################################
 ##########REPEAT FOR STATES##########
 #####################################
+
+dap_states<-dap_indicators
+dap_states$repeat.for.variable<-"states"
+
 
 #results-function (can take very long)
 start_time <- Sys.time()                                                                                                                    #timer for fun
@@ -156,7 +203,6 @@ list_of_results_indicators_state <-  from_analysisplan_map_to_output(df,
                                                           questionnaire = questionnaire, confidence_level = 0.90)
 end_time <- Sys.time()                                                                                                                      #timer
 end_time - start_time                                                                                                                       #timer
-#34 min for 15%, estimate 4h, was true
 
 
 #save results as R file and get it 
@@ -170,7 +216,6 @@ write.csv(big_table_indicators_state, file= paste0("output/big_table_indicators_
 #get table with p-values and F-statistic (if not only direct reporting)
 #pval_table(list_of_results_indicators_state$results, "output/list_of_results_indicators_hypo_state.csv")
 
-
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_state,
                                                render_result_with = hypegrammaR:::from_result_map_to_md_table,
@@ -182,11 +227,55 @@ hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_state,
                                                dir ="output",
                                                filename = "list_of_results_indicators_state.html")
 
+#####################################
+###REPEAT FOR STATES [IDP/NON-IDP]###
+#####################################
+
+dap_states_settlement<-dap_indicators
+dap_states_settlement$repeat.for.variable<-"states"
+dap_states_settlement$independent.variable<-"settlement_type"
+dap_states_settlement$independent.variable.type<-"categorical"
+
+#results-function (can take very long)
+start_time <- Sys.time()                                                                                                                    #timer for fun
+list_of_results_indicators_state <-  from_analysisplan_map_to_output(df,
+                                                                     analysisplan = dap_states_settlement,
+                                                                     weighting = weight.function,
+                                                                     cluster_variable_name = NULL,
+                                                                     questionnaire = questionnaire, confidence_level = 0.90)
+end_time <- Sys.time()                                                                                                                      #timer
+end_time - start_time                                                                                                                       #timer
+#34 min for 15%, estimate 4h, was true
+
+
+#save results as R file and get it 
+list_of_results_indicators_state_settlement %>% saveRDS("output/list_of_results_indicators_state_settlement.RDS")
+#list_of_results_indicators_state_settlement <- readRDS("output/list_of_results_indicators_state_settlement.RDS")
+
+#get table of results and save as csv
+big_table_indicators_state_settlement <- list_of_results_indicators_state_settlement$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
+write.csv(big_table_indicators_state_settlement, file= paste0("output/big_table_indicators_state_settlement.csv"), row.names=FALSE)
+
+#get table with p-values and F-statistic (if not only direct reporting)
+#pval_table(list_of_results_indicators_state_settlement$results, "output/list_of_results_indicators_hypo_state_settlement.csv")
+
+#get html output
+hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_state_settlement,
+                                               render_result_with = hypegrammaR:::from_result_map_to_md_table,
+                                               by_analysisplan_columns = c("dependent.var","repeat.var.value"),
+                                               by_prefix =  c("",""),
+                                               level = 2,
+                                               questionnaire = questionnaire,
+                                               label_varnames = TRUE,
+                                               dir ="output",
+                                               filename = "list_of_results_indicators_state_settlement.html")
+
+
 ######################################
 ##########REPEAT FOR REGIONS##########
 ######################################
 
-dap_region<-dap_indicators_state
+dap_region<-dap_indicators
 dap_region$repeat.for.variable<-"region"
 
 #results-function (can take very long)
@@ -222,3 +311,47 @@ hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_region
                                                label_varnames = TRUE,
                                                dir ="output",
                                                filename = "list_of_results_indicators_region.html")
+
+######################################
+###REPEAT FOR REGIONS[IDP/NON-IDP]####
+######################################
+
+dap_region_settlement<-dap_indicators
+dap_region_settlement$repeat.for.variable<-"region"
+dap_region_settlement$independent.variable<-"settlement_type"
+dap_region_settlement$independent.variable.type<-"categorical"
+
+#results-function (can take very long)
+start_time <- Sys.time()                                                                                                                    #timer for fun
+list_of_results_indicators_region_settlement <-  from_analysisplan_map_to_output(df,
+                                                                                 analysisplan = dap_region_settlement,
+                                                                                 weighting = weight.function,
+                                                                                 cluster_variable_name = NULL,
+                                                                                 questionnaire = questionnaire, confidence_level = 0.90)
+end_time <- Sys.time()                                                                                                                      #timer
+end_time - start_time                                                                                                                       #timer
+#34 min for 15%, estimate 4h, was true
+
+
+#save results as R file and get it 
+list_of_results_indicators_region_settlement %>% saveRDS("output/list_of_results_indicators_region_settlement.RDS")
+#list_of_results_indicators_region_settlement <- readRDS("output/list_of_results_indicators_region_settlement.RDS")
+
+#get table of results and save as csv
+big_table_indicators_region_settlement <- list_of_results_indicators_region_settlement$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
+write.csv(big_table_indicators_region, file= paste0("output/big_table_indicators_region_settlement.csv"), row.names=FALSE)
+
+#get table with p-values and F-statistic (if not only direct reporting)
+#pval_table(list_of_results_indicators_region_settlement$results, "output/list_of_results_indicators_hypo_region_settlement.csv")
+
+#get html output
+hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_region_settlement,
+                                               render_result_with = hypegrammaR:::from_result_map_to_md_table,
+                                               by_analysisplan_columns = c("dependent.var","repeat.var.value"),
+                                               by_prefix =  c("",""),
+                                               level = 2,
+                                               questionnaire = questionnaire,
+                                               label_varnames = TRUE,
+                                               dir ="output",
+                                               filename = "list_of_results_indicators_region_settlement.html")
+
