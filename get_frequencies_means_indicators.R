@@ -102,4 +102,4 @@ wide_table<-wide_table[-index2]                                                 
 
 #####EXPORT#####
 
-write.csv(wide_table,"output/frequency_means_table_indicatorscsv", row.names=FALSE)
+write.csv(wide_table,"output/frequency_means_table_indicators.csv", row.names=FALSE)
