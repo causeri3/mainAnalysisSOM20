@@ -22,11 +22,10 @@ dot_multiples<-function(x,y){
 #output:one score per household 1-3, NA
 #_______________________________________________________________________________________________________________________________________________________________________________________
 agg_binary<-function(x){
-  for (i in 1:dim(x)[2])                                                            #loop over all columns in non-critical data frame
-  {
+  for (i in 1:dim(x)[2]){                                                           #loop over all columns in non-critical data frame
     if (length(which(x[i]==0))==0){                                                 #if not binary coded:
-      x[i][(x[i]==1 | x[i]==2) & (!is.na(x[i]))]<-0                                   #recode 1&2 (if not NA) to 0
-      x[i][(x[i]==3 | x[i]==3 | x[i]==4 | x[i]=="4+" )& (!is.na(x[i]))]<-1            #recode 3 &4 & 4+ (if not NA) to 1
+      x[i][(x[i]==1 | x[i]==2) & (!is.na(x[i]))]<-0                                 #recode 1&2 (if not NA) to 0
+      x[i][(x[i]==3 | x[i]==3 | x[i]==4 | x[i]=="4+" )& (!is.na(x[i]))]<-1          #recode 3 &4 & 4+ (if not NA) to 1
     } 
     x[,i]<-as.numeric(x[,i])                                                        #make all columns numeric (issues due to 4+)
     #print(names(x[i]))                                                              #for debugging
@@ -36,8 +35,8 @@ agg_binary<-function(x){
   agg_score<-rep(NA, dim(x)[1])                                                     #initiate variable
   
   for (j in 1:dim(x)[1]){                                                           #loop over all rows in non-critical data frame
-    ratio<- round((sum(x[j,], na.rm=T) / length(which(!is.na(x[j,])))), digits=2)     #calculate ratio of 1 scored indicators from all possible scored indicators (exclude NA)
-    #print(ratio)                                                                     #for debugging
+    ratio<- round((sum(x[j,], na.rm=T) / length(which(!is.na(x[j,])))), digits=2)   #calculate ratio of 1 scored indicators from all possible scored indicators (exclude NA)
+    #print(ratio)                                                                   #for debugging
     if (is.na(ratio)){                                                              #if ratio NA
       agg_score[j]<-NA                                                              #make score NA 
     }
@@ -75,9 +74,9 @@ agg_max<-function(x,y){
   sectoral_df<-data.frame(y, agg_score)                                             #make data frame out of the aggregated non-citical and critical indicators
   sectoral_df[is.na(sectoral_df)]<-0                                                #recode NA to 0 (causing issues if one row has only NA)
   sectoral_agg<-rep(NA, dim(x)[1])                                                  #initiate variable
-    for (j in 1:dim(x)[1]){                                                         #loop over all households
-      sectoral_agg[j]<-max(sectoral_df[j,], na.rm=T)                                #take max 
-    }
+  for (j in 1:dim(x)[1]){                                                           #loop over all households
+    sectoral_agg[j]<-max(sectoral_df[j,], na.rm=T)                                  #take max 
+  }
   sectoral_agg[sectoral_agg==5]<-"4+" 
   sectoral_agg[sectoral_agg==0]<-NA                                                 #recode 0 to NA
   return(sectoral_agg)                                                              #recode 5 to 4+
@@ -90,17 +89,17 @@ agg_max<-function(x,y){
 #_______________________________________________________________________________________________________________________________________________________________________________________
 agg_critical<-function(y){
   y[y=="4+"]<-5                                                                     #recode 4+ to 5
-    for (i in 1:dim(y)[2]){
-      if (length(which(y[i]==0))!=0)                                                  #loop over columns of critical indicators
-      {print(paste0("Warning:binary scored:",names(y[i])))                            
-      }
-     y[,i]<-as.numeric(y[,i])                                                        #make all columns numeric (issues due to 4+)
+  for (i in 1:dim(y)[2]){
+    if (length(which(y[i]==0))!=0){                                                 #loop over columns of critical indicators
+      print(paste0("Warning:binary scored:",names(y[i])))                            
     }
+    y[,i]<-as.numeric(y[,i])                                                        #make all columns numeric (issues due to 4+)
+  }
   y[is.na(y)]<-0
   critical_agg<-rep(NA, dim(y)[1])                                                  #initiate variable
-    for (j in 1:dim(y)[1]){                                                         #loop over all households
-      critical_agg[j]<-max(y[j,], na.rm=T)                                          #take max 
-    }
+  for (j in 1:dim(y)[1]){                                                           #loop over all households
+    critical_agg[j]<-max(y[j,], na.rm=T)                                            #take max 
+  }
   critical_agg[critical_agg==5]<-"4+" 
   critical_agg[critical_agg==0]<-NA                                                 #recode 0 to NA
   return(critical_agg)                                                              #recode 5 to 4+
@@ -111,15 +110,14 @@ agg_critical<-function(y){
 #output: data frame with variables coded 1/0, NA
 #___________________________________________________________________________________________________________________________________________
 re_code<-function(x){
-  for (i in 1:dim(x)[2])                                                            #loop over all columns
-  {
-    if (length(which(x[i]==0))==0){                                                 #if not binary coded:
-      x[i][(x[i]==1 | x[i]==2) & (!is.na(x[i]))]<-0                                 #recode 1&2 (if not NA) to 0
-      x[i][(x[i]==3 | x[i]==3 | x[i]==4 | x[i]=="4+" )& (!is.na(x[i]))]<-1          #recode 3 &4 & 4+ (if not NA) to 1
+  for (i in 1:dim(x)[2]){                                                            #loop over all columns
+    if (length(which(x[i]==0))==0){                                                  #if not binary coded:
+      x[i][(x[i]==1 | x[i]==2) & (!is.na(x[i]))]<-0                                  #recode 1&2 (if not NA) to 0
+      x[i][(x[i]==3 | x[i]==3 | x[i]==4 | x[i]=="4+" )& (!is.na(x[i]))]<-1           #recode 3 &4 & 4+ (if not NA) to 1
     } 
-    x[i]<-as.numeric(as.character(unlist(x[i])))                                    #make all columns numeric
-    #print(names(x[i]))                                                              #for debugging
-    #print(table(x[i]))                                                              #for debugging
+    x[i]<-as.numeric(as.character(unlist(x[i])))                                     #make all columns numeric
+    #print(names(x[i]))                                                               #for debugging
+    #print(table(x[i]))                                                               #for debugging
     names(x)[i]<-paste0(names(x)[i], "_CG")
     }
   return(as.data.frame(x))
