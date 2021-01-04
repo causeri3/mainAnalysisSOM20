@@ -25,8 +25,8 @@ agg_binary<-function(x){
   for (i in 1:dim(x)[2])                                                            #loop over all columns in non-critical data frame
   {
     if (length(which(x[i]==0))==0){                                                 #if not binary coded:
-    x[i][(x[i]==1 | x[i]==2) & (!is.na(x[i]))]<-0                                   #recode 1&2 (if not NA) to 0
-    x[i][(x[i]==3 | x[i]==3 | x[i]==4 | x[i]=="4+" )& (!is.na(x[i]))]<-1            #recode 3 &4 & 4+ (if not NA) to 1
+      x[i][(x[i]==1 | x[i]==2) & (!is.na(x[i]))]<-0                                   #recode 1&2 (if not NA) to 0
+      x[i][(x[i]==3 | x[i]==3 | x[i]==4 | x[i]=="4+" )& (!is.na(x[i]))]<-1            #recode 3 &4 & 4+ (if not NA) to 1
     } 
     x[,i]<-as.numeric(x[,i])                                                        #make all columns numeric (issues due to 4+)
     #print(names(x[i]))                                                              #for debugging
@@ -36,8 +36,8 @@ agg_binary<-function(x){
   agg_score<-rep(NA, dim(x)[1])                                                     #initiate variable
   
   for (j in 1:dim(x)[1]){                                                           #loop over all rows in non-critical data frame
-  ratio<- round((sum(x[j,], na.rm=T) / length(which(!is.na(x[j,])))), digits=2)     #calculate ratio of 1 scored indicators from all possible scored indicators (exclude NA)
-  #print(ratio)                                                                     #for debugging
+    ratio<- round((sum(x[j,], na.rm=T) / length(which(!is.na(x[j,])))), digits=2)     #calculate ratio of 1 scored indicators from all possible scored indicators (exclude NA)
+    #print(ratio)                                                                     #for debugging
     if (is.na(ratio)){                                                              #if ratio NA
       agg_score[j]<-NA                                                              #make score NA 
     }
@@ -52,12 +52,12 @@ agg_binary<-function(x){
               else{                                                                 #score 3 if ratio bigger 66%
                 agg_score[j]<-3
               }
-          }
+            }
         }
-      }
+    }
     return(agg_score)
 }
-      
+
 
 #aggregate critical and non-critical indicators by taking the max
 #input: one data frame with non-critical, one with only critical indicators (non-critical,critical)
@@ -125,26 +125,6 @@ re_code<-function(x){
   return(as.data.frame(x))
 }
 
-#for (i in 1:dim(df_CG)[2])                                                            #loop over all columns
-#{
-#  if (length(which(df_CG[i]==0))==0){                                                 #if not binary coded:
-#    df_CG[i][(df_CG[i]==1 | df_CG[i]==2) & (!is.na(df_CG[i]))]<-0                                 #recode 1&2 (if not NA) to 0
-#    df_CG[i][(df_CG[i]==3 | df_CG[i]==3 | df_CG[i]==4 | df_CG[i]=="4+" )& (!is.na(df_CG[i]))]<-1          #recode 3 &4 & 4+ (if not NA) to 1
-#  } 
-#  df_CG[i]<-as.numeric(as.character(unlist(df_CG[i])))                                #make all columns numeric
-#  print(names(df_CG[i]))                                                              #for debugging
-#  print(table(df_CG[i]))                                                              #for debugging
-#  names(df_CG)[i]<-paste0(names(df_CG)[i], "_CG")
-#}
-
-
-#df_G_crit[df_G_crit=="4+"]<-5
-#sectoral_df<-data.frame(df_G_crit, agg_binary(df_G_bin))
-#for (j in 1:dim(sectoral_df)[2]){
-#  sectoral_df[,j]<-as.numeric(sectoral_df[,j])
-#}
-#for (i in 1:dim(df)[1]){
-#  max(sectoral_df[i,], na.rm=T)}
 
 ####################################################################################################################################################################################################################################################################################################
 ######NEW VARIABLES TO HELP CALCULATE SCORES########################################################################################################################################################################################################################################################
@@ -192,11 +172,11 @@ df$no_nfi_items<-(df$nfi_access.wintting_blankets+
                     df$nfi_access.dispting_gloves+
                     df$nfi_access.mosqting_Nets)
 
+
 ######FSC-Indicators##################################################################################################################################################
 
 #rSCI: reduced Coping Strategy Index; multiply relevant questions with USW (universal severity weight) or with nothing if USW=1 and add
 df$rCSI<- (df$rely_on_lessprefered + df$portion_limit + df$reduce_meals +(df$restrict_consumption*3) + (df$borrow_food*2))
-
 
 #HHS: Household Hunger Scale; create numeric variables and add to up
 #often,sometimes=1 rarely=0 
@@ -220,6 +200,7 @@ df$HHS<-(hhs1+hhs2+hhs3)
 #IHHS<-data.frame(hhs1,hhs2,hhs3)
 #omega(IHHS, nfactors=1)
 
+
 ####################################################################################################################################################################################################################################################################################################
 ######PRE-EXISTING VULNERABILITIES##################################################################################################################################################################################################################################################################
 ####################################################################################################################################################################################################################################################################################################
@@ -230,7 +211,6 @@ df$A1[df$household_expenditure=="adult_female" |df$household_expenditure=="adult
 df$A1[df$household_expenditure=="eldery_female" |df$household_expenditure=="eldery_male"]<-3
 df$A1[df$household_expenditure=="female_14_17" |df$household_expenditure=="male_14_17"]<-4
 df$A1[df$household_expenditure=="female_13" |df$household_expenditure=="male_13"]<-"4+"
-
 
 df$A2[df$breadwinner=="adult_female" |df$breadwinner=="adult_male"]<-1
 df$A2[df$breadwinner=="eldery_female" |df$breadwinner=="eldery_male"]<-3
@@ -249,6 +229,7 @@ df$A5<- rep(NA, nrow(df))
 df$A5[(child_elderly/adultish)<0.8]<-0
 df$A5[(child_elderly/adultish)>=0.8]<-1
 
+
 ######socioeconomic###################################################################################################################################################
 
 df$B1<- rep(NA, nrow(df))
@@ -261,37 +242,6 @@ df$B2[df$main_source_food.purchased_market=="1" | df$main_source_food.own_cultiv
 df$B2[df$main_source_food.bartering_Bartering=="1" | df$main_source_food.fishing_Fishing=="1" |df$main_source_food.foraging_Foraging=="1" | df$main_source_food.hunting_Hunting=="1"| df$main_source_food.other=="1"]<-3
 df$B2[df$main_source_food.reliant_friends=="1" | df$main_source_food.reliant_assistance=="1"| df$main_source_food.reliant_gov_assist=="1"]<-4
 
-#check<-(df$main_source_food.purchased_market + df$main_source_food.own_cultivation + df$main_source_food.own_livestock + df$main_source_food.bartering_Bartering + df$main_source_food.fishing_Fishing + df$main_source_food.foraging_Foraging + df$main_source_food.hunting_Hunting + df$main_source_food.other + df$main_source_food.reliant_friends + df$main_source_food.reliant_assistance + df$main_source_food.reliant_gov_assist)
-
-
-#ran into issue, see:
-#df$main_source_food[which(is.na(df$B2))]
-#df$main_source_food.purchased_market[which(is.na(df$B2))]
-#there are more wrong entries than the ones causing issues
-#df$main_source_food.purchased_market[which(df$main_source_food=="purchased_market ")]
-
-#0 have income_scr.none=1
-#check to see which surveys got changed to 0 in the cleaned data set from the raw one
-#u_raw_income<-raw$X_uuid[which(raw$income_src.none==1)]
-#index<-rep(0, length(u_raw_income))
-#for (i in 1:length(u_raw_income)){
-#if (is.integer(which(df$X_uuid==u_raw_income[i])) && length(which(df$X_uuid==u_raw_income[i])) == 0) {index[i]<-NA}
-#  else{index[i]<-which(df$X_uuid==u_raw_income[i])}}
-#index<-index[!is.na(index)]
-#length(index)
-#304
-#df$B2[index]
-#one of those is causing an NA in B2
-
-#discussions about inverse????
-#df$B3<- rep(NA, nrow(df))
-#df$B3[(df$hh_members_income/df$hh_size)<0.8]<-0
-#df$B3[(df$hh_members_income/df$hh_size)>=0.8]<-1
-
-#mean(df$hh_members_income/df$hh_size)
-#0.02711341
-#about 3% is the mean of hh_members working
-
 df$B3<- rep(NA, nrow(df))
 df$B3[df$hh_members_new_unemployed==0]<-0
 df$B3[df$hh_members_new_unemployed>0]<-1
@@ -299,7 +249,6 @@ df$B3[df$hh_members_new_unemployed>0]<-1
 df$B4<- rep(NA, nrow(df))
 df$B4[df$hh_members_income>0]<-0
 df$B4[df$hh_members_income==0]<-1
-
 
 df$B5<- rep(NA, nrow(df))
 df$B5[df$employ_loss_why.end_contract=="1" | df$employ_loss_why.other=="1"]<-1
@@ -325,58 +274,6 @@ df$C2[df$displaced_locs>1]<-1
 #C7 not scored: df$when_continue
 #C8 not scored: df$district
 
-#df$C4<- rep(NA, nrow(df))
-#df$C4[df$hosting_idp=="no"]<-0
-#df$C4[df$hosting_idp=="yes"]<-1
-
-#df$displaced_days<-(df$difference_arrived_left_days+df$difference_arrived_today_days)
-#df$C5<- rep(NA, nrow(df))
-#df$C5<-((df$difference_arrived_left_days+df$difference_arrived_today_days)/df$displaced_locs)
-#length(which(df$C5==Inf)) #344
-#length(which(df$displaced_locs==0))
-#df$difference_arrived_today_days[df$displaced_locs==0 & !is.na(df$displaced_loc)]
-#df$difference_arrived_left_days[df$displaced_locs==0& !is.na(df$displaced_loc)]
-#df$difference_arrived_today_days[which(df$displaced_locs==0)]
-#df$difference_arrived_left_days[which(df$displaced_locs==0)]
-#df$difference_arrived_left_days[which(df$displaced_locs==0)]
-#df$difference_arrived_today_days[which(df$displaced_locs==0)]
-
-
-#df$displaced_locs[which(df$displaced_locs==0)]<-1
-
-#df$displaced_days<-(df$difference_arrived_left_days+df$difference_arrived_today_days)
-#df$C5<- rep(NA, nrow(df))
-#df$C5<-((df$difference_arrived_left_days+df$difference_arrived_today_days)/df$displaced_locs)
-
-#boxplot(df$C5,main = "difference days / displaced locs", add = F, ann = FALSE, yaxt = "n")
-#axis(2, at = seq(0, 15000, 500), las = 2)
-#grid()
-
-#hist(df$C5,breaks = seq(0, 100000, 100))
-
-#ggplot(df) + 
-#  geom_histogram(aes(x = C5),# y = (..count..)), 
-#                 bins = 100, fill = "gray", colour = "black") +
-  #stat_function(fun = dnorm, 
-  #              args = list(mean = mean(df$C5, na.rm=T), 
-  #                          sd = sd(df$C5, na.rm=T)),
-  #              colour = "salmon", size = 1.25) +
-#  xlab("Incidator displaced days/locations") +
-#  ylab("Frequency")
-
-#library(ggplot2)
-
-#ggplot(data = df, aes(y=C5)) +
-#  geom_boxplot() +
-  #xlab("Number of Cylinders") +
-#  ylab("difference days / displaced locs") +
-#  theme_bw()
-
-#ggplot(data = df, aes(x=displaced_days, y=displaced_locs)) +
-#  geom_boxplot() +
-#  xlab("days displaced") +
-#  ylab("# displaced locations") +
-#  theme_bw()
 
 ######documentation###################################################################################################################################################
 
@@ -385,27 +282,6 @@ df$D1[df$certificate_ids=="all_id"|df$certificate_ids=="yes_id"]<-0
 df$D1[df$certificate_ids=="some_id"|df$certificate_ids=="no_id"]<-1
 
 
-#df$D1<- rep(NA, nrow(df))
-#df$D1[df$written_documentation=="no"]<-0
-#df$D1[df$written_documentation=="yes"]<-1
-
-#Faraz: barriers due to documentation, does not fit with answers in dap
-#df$D2<- rep(NA, nrow(df))
-#df$D2[df$hlp_problems.none==1]<-0
-#df$D2[df$written_documentation=="yes"]<-1
-
-#options:
-#hlp_problems.disputed_ownership
-#hlp_problems.property_occupation
-#hlp_problems.disputes_tenant
-#hlp_problems.rules_clear
-#hlp_problems.inheritance_issues
-#hlp_problems.lack_documents
-#hlp_problems.looting_property
-#hlp_problems.threat_others
-#hlp_problems.other
-#hlp_problems.not_sure
-
 ######discrimination##################################################################################################################################################
 
 df$E1<- rep(NA, nrow(df))
@@ -413,6 +289,7 @@ df$E1[df$factors_aid.None==1]<-0
 df$E1[df$factors_aid.30.==1|df$factors_aid.60.==1|df$factors_aid.Disability._Person_living_with_a_disability==1|df$factors_aid.Heritage._A_member_of_a_minority_or_marginalised_community==1]<-1
 
 #E2 not scored: length(dot_multiples("services_affected[.]",df))[df$services_affected.access_remedies df$services_affected.security df$services_affected.health df$services_affected.education df$services_affected.water df$services_affected.food df$services_affected.cash df$services_affected.work df$services_affected.other]
+
 
 ######COVID-related###################################################################################################################################################
 
@@ -442,15 +319,6 @@ df$F6[df$SD<=1]<-1
 df$F6[1<df$SD & df$SD <=2]<-2
 df$F6[2<df$SD & df$SD <=2.5]<-3
 df$F6[df$SD>2.5]<-4
-
-#df$chronic_illness_hh_members.eldery_male
-#df$chronic_illness_hh_members.eldery_female
-#df$chronic_illness_hh_members.adult_male
-#df$chronic_illness_hh_members.adult_female
-#df$chronic_illness_hh_members.male_14_17
-#df$chronic_illness_hh_members.female_14_17
-#df$chronic_illness_hh_members.male_13
-#df$chronic_illness_hh_members.female_13
 
 #____________________________aggregate to overall PEV ____________________________
 
@@ -573,6 +441,7 @@ df$H10[df$barriers_health.medical_refused==1 | df$barriers_health.no_pwd==1]<-4
 
 #H11 not scored: length(dot_multiples("cash_health[.]",df))
 
+
 #____________________________aggregate to sectoral LSG____________________________
 
 df_H_bin<-data.frame(df$H2, df$H3, df$H4, df$H5, df$H6, df$H10)
@@ -620,7 +489,8 @@ df$LSG_nutrition<-agg_max(df_I_bin,df_I_crit)
 
 #_________________________________________________________________________________
 
-######food security###################################################################################################################################################
+
+######food security [SFC]###############################################################################################################################################
 
 df$J1<- rep(NA, nrow(df))
 df$J1[df$main_source_food.purchased_market==1 | df$main_source_food.own_cultivation==1 | df$main_source_food.own_livestock==1]<-1
@@ -652,6 +522,7 @@ df_J_crit<-data.frame(df$J1, df$J2, df$J3)
 df$LSG_FSC<-agg_max(df_J_bin,df_J_crit)
 
 #_________________________________________________________________________________
+
 
 ######water sanitation & hygiene [WASH] ##############################################################################################################################
 
@@ -738,6 +609,7 @@ df$LSG_WASH<-agg_max(df_K_bin,df_K_crit)
 
 #_________________________________________________________________________________
 
+
 ######shelter & non-food items [SNFI]#################################################################################################################################
 
 df$L1<- rep(NA, nrow(df))
@@ -789,39 +661,8 @@ df$L11[df$no_nfi_items==28]<-1
 df$L11[df$no_nfi_items<28 & df$no_nfi_items>4]<-2
 df$L11[df$no_nfi_items==4]<-3
 df$L11[df$no_nfi_items<4]<-4
-no_nfi_items
 
 #L12: not scored: length(dot_multiples("shetler_support[.]",df))
-
-#df$shetler_support.beddting_items
-#df$shetler_support.wintting_blankets
-#df$shetler_support.mattting_mats
-#df$shetler_support.cookting_utensils
-#df$shetler_support.cookting_fuel
-#df$shetler_support.wateting_containers
-#df$shetler_support.jerrting_can
-#df$shetler_support.Torches
-#df$shetler_support.solating_lamps
-#df$shetler_support.solating_panels
-#df$shetler_support.Generators
-#df$shetler_support.Batteries
-#df$shetler_support.Clothing
-#df$shetler_support.wintting_clothing
-#df$shetler_support.Shoes
-#df$shetler_support.wintting_shoes
-#df$shetler_support.wintting_heaters
-#df$shetler_support.heatting_fuel
-#df$shetler_support.dispting_diapers
-#df$shetler_support.saniting_pads
-#df$shetler_support.Soap
-#df$shetler_support.washting_powder
-#df$shetler_support.cleating_house
-#df$shetler_support.deteting_dishes
-#df$shetler_support.hygiting_kits
-#df$shetler_support.hygiting_kits
-#df$shetler_support.faceting_masks
-#df$shetler_support.dispting_gloves
-#df$shetler_support.mosqting_Nets
 
 #____________________________aggregate to sectoral LSG____________________________
 
@@ -830,6 +671,7 @@ df_L_crit<-data.frame(df$L1, df$L2, df$L4, df$L11)
 df$LSG_SNFI<-agg_max(df_L_bin,df_L_crit)
 
 #_________________________________________________________________________________
+
 
 ######protection######################################################################################################################################################
 
@@ -892,6 +734,7 @@ df$LSG_protection<-agg_max(df_M_bin,df_M_crit)
 
 #_________________________________________________________________________________
 
+
 ####################################################################################################################################################################################################################################################################################################
 ######ACCOUNTABILITY TO AFFECTED PEOPLE [AAP] & COVID-INFO##########################################################################################################################################################################################################################################
 ####################################################################################################################################################################################################################################################################################################
@@ -930,6 +773,7 @@ df$N7[df$aid_barriers.insecure_route==1 |df$aid_barriers.insecure_site==1 | df$a
 #N18: not scored: length(dot_multiples("factors_aid[.]",df))
 #N18: not scored: length(dot_multiples("services_affected[.]",df))
 
+
 ######COVID#############################################################################################################################################################
 
 #O1: not scored: length(dot_multiples("trust_covidinfo[.]",df))
@@ -939,8 +783,9 @@ df$N7[df$aid_barriers.insecure_route==1 |df$aid_barriers.insecure_site==1 | df$a
 #O5: not scored: length(dot_multiples("signs_covid[.]",df))
 #O6: not scored: length(dot_multiples("hh_covid_action[.]",df))
 
+
 ####################################################################################################################################################################################################################################################################################################
-######COPING GAPS & MULTI SECTOR NEEDS INDEX [CG'S & MSNI]##########################################################################################################################################################################################################################################
+######COPING GAPS & MULTI-SECTOR NEEDS INDEX [CG'S & MSNI]##########################################################################################################################################################################################################################################
 ####################################################################################################################################################################################################################################################################################################
 
 CG<-c("G2", "G4", "J3", "K9", "K11", "K12", "M1", "M2")
@@ -951,42 +796,15 @@ df<-cbind(df, df_CG_recoded)
 
 LSG<-c("LSG_education", "LSG_health", "LSG_nutrition", "LSG_FSC", "LSG_WASH", "LSG_SNFI", "LSG_protection" )
 df_MSNI<-df[LSG]
-df$MSNI<-agg_max(df_MSNI)
+df$MSNI<-agg_critical(df_MSNI)
+
 
 ####################################################################################################################################################################################################################################################################################################
 ######EXPORT########################################################################################################################################################################################################################################################################################
 ####################################################################################################################################################################################################################################################################################################
 
-write.csv(df,"output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored.csv", row.names=FALSE)
+today <- Sys.Date()
+today<-format(today, format="_%Y_%b_%d")
 
-######################Pregancy issue###############################################################################################
-incon30<-(df$pregnancy=="yes" & (df$females_16_17+df$females_13_15+df$females_18_40+df$females_41_59)==0)
-i30<-which(incon30)
-u30<-df$X_uuid[which(incon30)]
-#v30<-rep("pregnancy=yes, but no females between 13&59 years in hh", length(i30))
-#uuid<-c(uuid,u30)
-#index<-c(index,i30)
-#variables<-c(variables,v30)
+write.csv(df, paste0("output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored",today,".csv"), row.names=FALSE)
 
-incon31<-(df$pregnancy=="" & (df$females_16_17+df$females_13_15+df$females_18_40+df$females_41_59)>0)
-i31<-which(incon31)
-u31<-df$X_uuid[which(incon31)]
-
-incon31<-(df$pregnancy=="" & (df$females_16_17+df$females_18_40+df$females_13_15)>0)
-i31<-which(incon31)
-u31<-df$X_uuid[which(incon31)]
-
-#incon31<-(df2$pregnancy=="" & (df2$females_16_17+df2$females_13_15+df2$females_18_40+df2$females_41_59)>0)
-#i31<-which(incon31)
-#u31<-df2$X_uuid[which(incon31)]
-
-incon32<-(raw$pregnancy=="" & (raw$females_16_17+raw$females_13_15+raw$females_18_40+raw$females_41_59)>0)
-i32<-which(incon32)
-u32<-raw$X_uuid[which(incon32)]
-
-incon32<-(raw$pregnancy=="" & (raw$females_16_17+raw$females_13_15+raw$females_18_40)>0)
-i32<-which(incon32)
-u32<-raw$X_uuid[which(incon32)]
-
-u<-c(u31,u32)
-length(unique(u))
