@@ -5,14 +5,22 @@ df<-read.csv(file="input/REACH_SOM2006_JMCNA_IV_Data-Set_August2020_October_27_2
 raw<-read.csv(file="C:/Users/Vanessa Causemann/Desktop/REACH/Data/REACH_SOM2006_JMCNA_IV_Data-Set_August2020_October_27_2020_RAW.csv", head=T, dec=".", sep=",")
 
 
-######FUNCTION######################################################################################################################################################################################################################################################################################
+######FUNCTIONS######################################################################################################################################################################################################################################################################################
 
-#get all dummy multiples, by their stacked character variable, i.e. dot_multiples("market_goods", df) or dot_multiples("market_goods[.]",df) to only get the binaries
+#get all dummy multiples, by their stacked character variable
+#input: variable name and data frame ("variable", df) i.e. dot_multiples("market_goods", df) or dot_multiples("market_goods[.]",df) to only get the binaries
+#output: string with all varaibles containing the name 
+#_______________________________________________________________________________________________________________________________________________________________________________________
 dot_multiples<-function(x,y){
   choice_var<-grep(x, names(y), value = TRUE)
   print(choice_var)
 }
 
+
+#recode to 0/1 and NA and aggregate non-critical indicators by guidance 0-33%->1; 34-66%->2 67-100%->3
+#input: data frame with only non-critical indicators, scored 1/0, NA or 1-4+, NA
+#output:one score per household 1-3, NA
+#_______________________________________________________________________________________________________________________________________________________________________________________
 agg_binary<-function(x){
   for (i in 1:dim(x)[2])                                                            #loop over all columns in non-critical data frame
   {
@@ -20,6 +28,7 @@ agg_binary<-function(x){
     x[i][(x[i]==1 | x[i]==2) & (!is.na(x[i]))]<-0                                   #recode 1&2 (if not NA) to 0
     x[i][(x[i]==3 | x[i]==3 | x[i]==4 | x[i]=="4+" )& (!is.na(x[i]))]<-1            #recode 3 &4 & 4+ (if not NA) to 1
     } 
+    x[,i]<-as.numeric(x[,i])                                                        #make all columns numeric (issues due to 4+)
     #print(names(x[i]))                                                              #for debugging
     #print(table(x[i]))                                                              #for debugging
   }
@@ -49,9 +58,12 @@ agg_binary<-function(x){
     return(agg_score)
 }
       
-    
 
-agg_LSGs<-function(x,y){
+#aggregate critical and non-critical indicators by taking the max
+#input: one data frame with non-critical, one with only critical indicators (non-critical,critical)
+#output: one score per household 1-4+, NA
+#_______________________________________________________________________________________________________________________________________________________________________________________
+agg_max<-function(x,y){
   y[y=="4+"]<-5                                                                     #recode 4+ to 5
   for (i in 1:dim(y)[2]){
     if (length(which(y[i]==0))!=0)                                                  #loop over columns of critical indicators
@@ -70,6 +82,60 @@ agg_LSGs<-function(x,y){
   sectoral_agg[sectoral_agg==0]<-NA                                                 #recode 0 to NA
   return(sectoral_agg)                                                              #recode 5 to 4+
 }
+
+
+#aggregate critical indicators by taking the max
+#input: one data frame with only critical indicators
+#output: one score per household 1-4+, NA
+#_______________________________________________________________________________________________________________________________________________________________________________________
+agg_critical<-function(y){
+  y[y=="4+"]<-5                                                                     #recode 4+ to 5
+    for (i in 1:dim(y)[2]){
+      if (length(which(y[i]==0))!=0)                                                  #loop over columns of critical indicators
+      {print(paste0("Warning:binary scored:",names(y[i])))                            
+      }
+     y[,i]<-as.numeric(y[,i])                                                        #make all columns numeric (issues due to 4+)
+    }
+  y[is.na(y)]<-0
+  critical_agg<-rep(NA, dim(y)[1])                                                  #initiate variable
+    for (j in 1:dim(y)[1]){                                                         #loop over all households
+      critical_agg[j]<-max(y[j,], na.rm=T)                                          #take max 
+    }
+  critical_agg[critical_agg==5]<-"4+" 
+  critical_agg[critical_agg==0]<-NA                                                 #recode 0 to NA
+  return(critical_agg)                                                              #recode 5 to 4+
+}
+
+#recode 1-4+ to 1/0 indicators
+#input: data frame with variables coded in 1-4+, NA
+#output: data frame with variables coded 1/0, NA
+#___________________________________________________________________________________________________________________________________________
+re_code<-function(x){
+  for (i in 1:dim(x)[2])                                                            #loop over all columns
+  {
+    if (length(which(x[i]==0))==0){                                                 #if not binary coded:
+      x[i][(x[i]==1 | x[i]==2) & (!is.na(x[i]))]<-0                                 #recode 1&2 (if not NA) to 0
+      x[i][(x[i]==3 | x[i]==3 | x[i]==4 | x[i]=="4+" )& (!is.na(x[i]))]<-1          #recode 3 &4 & 4+ (if not NA) to 1
+    } 
+    x[i]<-as.numeric(as.character(unlist(x[i])))                                    #make all columns numeric
+    #print(names(x[i]))                                                              #for debugging
+    #print(table(x[i]))                                                              #for debugging
+    names(x)[i]<-paste0(names(x)[i], "_CG")
+    }
+  return(as.data.frame(x))
+}
+
+#for (i in 1:dim(df_CG)[2])                                                            #loop over all columns
+#{
+#  if (length(which(df_CG[i]==0))==0){                                                 #if not binary coded:
+#    df_CG[i][(df_CG[i]==1 | df_CG[i]==2) & (!is.na(df_CG[i]))]<-0                                 #recode 1&2 (if not NA) to 0
+#    df_CG[i][(df_CG[i]==3 | df_CG[i]==3 | df_CG[i]==4 | df_CG[i]=="4+" )& (!is.na(df_CG[i]))]<-1          #recode 3 &4 & 4+ (if not NA) to 1
+#  } 
+#  df_CG[i]<-as.numeric(as.character(unlist(df_CG[i])))                                #make all columns numeric
+#  print(names(df_CG[i]))                                                              #for debugging
+#  print(table(df_CG[i]))                                                              #for debugging
+#  names(df_CG)[i]<-paste0(names(df_CG)[i], "_CG")
+#}
 
 
 #df_G_crit[df_G_crit=="4+"]<-5
@@ -386,6 +452,13 @@ df$F6[df$SD>2.5]<-4
 #df$chronic_illness_hh_members.male_13
 #df$chronic_illness_hh_members.female_13
 
+#____________________________aggregate to overall PEV ____________________________
+
+df_PEV<-data.frame(df$A1, df$A2, df$A3,df$A4, df$A5, df$B1,df$B2, df$B3, df$B4,df$B5, df$C1, df$C2,df$D1, df$E1, df$F1,df$F2, df$F3, df$F4,df$F5, df$F6)
+df$PEV<-agg_binary(df_PEV)
+
+#_________________________________________________________________________________
+
 ####################################################################################################################################################################################################################################################################################################
 ######LIVING STANDARD & COPING GAPS [LSG's & CG's]##################################################################################################################################################################################################################################################
 ####################################################################################################################################################################################################################################################################################################
@@ -446,7 +519,7 @@ df$G11[df$HH_schoolaged_children>0 & df$school_barrier_girls_note.security_conce
 
 df_G_bin<-data.frame(df$G5, df$G6, df$G7)
 df_G_crit<-data.frame(df$G1, df$G10, df$G11)
-LSG_education<-agg_LSGs(df_G_bin,df_G_crit)
+df$LSG_education<-agg_max(df_G_bin,df_G_crit)
 
 #_________________________________________________________________________________
 
@@ -504,7 +577,7 @@ df$H10[df$barriers_health.medical_refused==1 | df$barriers_health.no_pwd==1]<-4
 
 df_H_bin<-data.frame(df$H2, df$H3, df$H4, df$H5, df$H6, df$H10)
 df_H_crit<-data.frame(df$H1, df$H7, df$H8)
-LSG_health<-agg_LSGs(df_H_bin,df_H_crit)
+df$LSG_health<-agg_max(df_H_bin,df_H_crit)
 
 #_________________________________________________________________________________
 
@@ -539,6 +612,14 @@ df$I6[df$nutrition_barriers.unaware_services==1 | df$nutrition_barriers.unaware_
 df$I6[df$nutrition_barriers.difficulty==1 | df$nutrition_barriers.facilities==1 | df$nutrition_barriers.prohibitive==1 ]<-3
 df$I6[df$nutrition_barriers.insecurity==1 | df$nutrition_barriers.inaccessible==1 | df$nutrition_barriers.inaccessible_clans==1 ]<-4
 
+#____________________________aggregate to sectoral LSG____________________________
+
+df_I_bin<-data.frame(df$I2, df$I4, df$I5)
+df_I_crit<-data.frame(df$I1, df$I3, df$I6)
+df$LSG_nutrition<-agg_max(df_I_bin,df_I_crit)
+
+#_________________________________________________________________________________
+
 ######food security###################################################################################################################################################
 
 df$J1<- rep(NA, nrow(df))
@@ -564,6 +645,14 @@ df$J4[df$market_time=="less15"|df$market_time=="min_15_29"|df$market_time=="min_
 df$J4[df$market_transport=="car"|df$market_transport=="cart"|df$market_transport=="moto"|df$market_transport=="bus"]<-0
 df$J4[(df$market_transport=="walking") & (df$market_time=="hr_1_2"|df$market_time=="more2h")]<-1
 
+#____________________________aggregate to sectoral LSG____________________________
+
+df_J_bin<-data.frame(df$J4)
+df_J_crit<-data.frame(df$J1, df$J2, df$J3)
+df$LSG_FSC<-agg_max(df_J_bin,df_J_crit)
+
+#_________________________________________________________________________________
+
 ######water sanitation & hygiene [WASH] ##############################################################################################################################
 
 df$K1<- rep(NA, nrow(df))
@@ -588,8 +677,8 @@ df$K4[df$sanitation_facility=="pit_latrine_without" | df$sanitation_facility=="o
 df$K4[df$sanitation_facility=="none_of"]<-4
 
 df$K5<- rep(NA, nrow(df))
-df$K5[df$soap_access=="yes"]<-0
-df$K5[df$soap_access=="no"]<-1
+df$K5[df$soap_access=="yes"]<-1
+df$K5[df$soap_access=="no"]<-3
 
 df$K6<- rep(NA, nrow(df))
 df$K6[(df$latrine_features.door + df$latrine_features.access + df$latrine_features.walls_ + df$latrine_features.inside + df$latrine_features.lock + df$latrine_features.outside + df$latrine_features.close + df$latrine_features.marked + df$latrine_features.soap)>6]<-0
@@ -640,6 +729,14 @@ df$K13[df$menstrual_barriers.no_problem==1]<-0
 df$K13[df$menstrual_barriers.no_access==1 | df$menstrual_barriers.no_money==1]<-1
 
 #K14 not scored: length(dot_multiples("hand_washing_times[.]",df))
+
+#____________________________aggregate to sectoral LSG____________________________
+
+df_K_bin<-data.frame(df$K3, df$K9, df$K6, df$K10, df$K11, df$K12, df$K7, df$K13)
+df_K_crit<-data.frame(df$K1, df$K2, df$K4, df$K5, df$K8)
+df$LSG_WASH<-agg_max(df_K_bin,df_K_crit)
+
+#_________________________________________________________________________________
 
 ######shelter & non-food items [SNFI]#################################################################################################################################
 
@@ -726,11 +823,19 @@ no_nfi_items
 #df$shetler_support.dispting_gloves
 #df$shetler_support.mosqting_Nets
 
+#____________________________aggregate to sectoral LSG____________________________
+
+df_L_bin<-data.frame(df$L3, df$L6, df$L8, df$L9, df$L10)
+df_L_crit<-data.frame(df$L1, df$L2, df$L4, df$L11)
+df$LSG_SNFI<-agg_max(df_L_bin,df_L_crit)
+
+#_________________________________________________________________________________
+
 ######protection######################################################################################################################################################
 
 df$M1<- rep(NA, nrow(df))
-df$M1[df$child_labor_note=="no"]<-0
-df$M1[df$child_labor_note=="yes"]<-1
+df$M1[df$child_labor_note=="no"]<-1
+df$M1[df$child_labor_note=="yes"]<-3
 
 df$M2<- rep(NA, nrow(df))
 df$M2[df$children_away=="no"]<-1
@@ -760,8 +865,8 @@ df$M6[df$not_safe_girls=="yes"]<-"4+"
 #M7: not scored: length(dot_multiples("where_not_safe_girls[.]",df))
 
 df$M8<- rep(NA, nrow(df))
-df$M8[df$hh_incidents=="no"]<-0
-df$M8[df$hh_incidents=="yes"]<-1
+df$M8[df$hh_incidents=="no"]<-1
+df$M8[df$hh_incidents=="yes"]<-3
 
 df$M9<- rep(NA, nrow(df))
 df$M9[df$child_friendly=="yes"]<-0
@@ -778,6 +883,14 @@ df$M11[df$gbv_incidents=="yes"]<-4
 df$M12<- rep(NA, nrow(df))
 df$M12[df$medical_services=="yes"]<-0
 df$M12[df$medical_services=="no"]<-1
+
+#____________________________aggregate to sectoral LSG____________________________
+
+df_M_bin<-data.frame(df$M9, df$M10, df$M12, df$M6, df$M4, df$M11)
+df_M_crit<-data.frame(df$M1, df$M8, df$M2, df$M3)
+df$LSG_protection<-agg_max(df_M_bin,df_M_crit)
+
+#_________________________________________________________________________________
 
 ####################################################################################################################################################################################################################################################################################################
 ######ACCOUNTABILITY TO AFFECTED PEOPLE [AAP] & COVID-INFO##########################################################################################################################################################################################################################################
@@ -827,13 +940,22 @@ df$N7[df$aid_barriers.insecure_route==1 |df$aid_barriers.insecure_site==1 | df$a
 #O6: not scored: length(dot_multiples("hh_covid_action[.]",df))
 
 ####################################################################################################################################################################################################################################################################################################
-######AGGREGATION###################################################################################################################################################################################################################################################################################
+######COPING GAPS & MULTI SECTOR NEEDS INDEX [CG'S & MSNI]##########################################################################################################################################################################################################################################
 ####################################################################################################################################################################################################################################################################################################
+
+CG<-c("G2", "G4", "J3", "K9", "K11", "K12", "M1", "M2")
+#df_CG<-data.frame(df$G2, df$G4, df$J3, df$K9, df$K11, df$K12,df$M1, df$M2)
+df_CG<-df[CG]
+df_CG_recoded<-re_code(df_CG)
+df<-cbind(df, df_CG_recoded)
+
+LSG<-c("LSG_education", "LSG_health", "LSG_nutrition", "LSG_FSC", "LSG_WASH", "LSG_SNFI", "LSG_protection" )
+df_MSNI<-df[LSG]
+df$MSNI<-agg_max(df_MSNI)
 
 ####################################################################################################################################################################################################################################################################################################
 ######EXPORT########################################################################################################################################################################################################################################################################################
 ####################################################################################################################################################################################################################################################################################################
-
 
 write.csv(df,"output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored.csv", row.names=FALSE)
 
