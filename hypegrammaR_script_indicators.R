@@ -11,13 +11,13 @@ kobochoices <- read.csv("input/choices.csv", header = T, stringsAsFactors = F)
 koboquestions <- read.csv("input/questions.csv", header = T, stringsAsFactors = F)
 
 #create dap:
-dependent.variable<-names(df)[992:dim(df)[2]]
+indicators<-names(df)[992:dim(df)[2]]
+
+dependent.variable<-indicators
 research.question<-rep(NA, length(dependent.variable))
 sub.research.question<-rep(NA, length(dependent.variable))
 repeat.for.variable<-rep(NA, length(dependent.variable))
-#independent.variable<-rep("settlement_type", length(dependent.variable))
 independent.variable<-rep(NA, length(dependent.variable))
-#independent.variable.type<-rep("categorical", length(dependent.variable))
 independent.variable.type<-rep(NA, length(dependent.variable))
 dependent.variable.type<-rep("categorical", length(dependent.variable))
 hypothesis.type<-rep("direct_reporting", length(dependent.variable))
@@ -30,7 +30,6 @@ dap_indicators<-data.frame(research.question,
                            dependent.variable,
                            dependent.variable.type,
                            hypothesis.type)
-
 
 
 #adjust data set to sampling frame formatting
@@ -66,6 +65,11 @@ questionnaire<-load_questionnaire(data = df,
 
 #test if all variable names fit
 #dap_indicators$dependent.variable %in% names(df)
+
+#make sure to only have character variables
+for (i in 1:length(indicators)){
+  df[indicators[i]]<-as.character(unlist(df[indicators[i]]))
+}
 
 #adapt naming to hypegrammaR-style
 dap_indicators$dependent.variable<-hypegrammaR:::to_alphanumeric_lowercase(dap_indicators$dependent.variable)
