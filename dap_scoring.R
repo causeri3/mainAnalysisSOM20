@@ -292,11 +292,11 @@ df$E1[df$factors_aid.30.==1|df$factors_aid.60.==1|df$factors_aid.Disability._Per
 ######COVID-related###################################################################################################################################################
 
 df$F1<- rep(NA, nrow(df))
-df$F1[df$soap_access=="buckets_with_taps"]<-0
+df$F1[df$soap_access=="yes"]<-0
 df$F1[df$soap_access=="no"]<-1
 
 df$F2<- rep(NA, nrow(df))
-df$F3[df$hand_washing_facility=="buckets_with_taps"|df$hand_washing_facility=="sink_with_tap"|df$hand_washing_facility=="tippy_tap"]<-0
+df$F2[df$hand_washing_facility=="buckets_with_taps"|df$hand_washing_facility=="sink_with_tap"|df$hand_washing_facility=="tippy_tap"]<-0
 df$F2[df$hand_washing_facility=="no_specific"]<-1
 
 df$F3<- rep(NA, nrow(df))
