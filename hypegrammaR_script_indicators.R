@@ -5,7 +5,7 @@ library(dplyr)
 setwd("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/GitHub/mainAnalysisSOM20")
 
 #import all necessary files (data set, dap, sampling frame, choices and questions from kobo-tool)
-df<-read.csv(file="output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored_2021_Jan_04.csv", head=T, dec=".", sep=",", stringsAsFactors = F)
+df<-read.csv(file="output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored_2021_Jan_06.csv", head=T, dec=".", sep=",", stringsAsFactors = F)
 sf<-read.csv(file="input/sampling_frame.csv", head=T, dec=".", sep=",", stringsAsFactors = F)         #from population_patching_and_weighting.R
 kobochoices <- read.csv("input/choices.csv", header = T, stringsAsFactors = F)
 koboquestions <- read.csv("input/questions.csv", header = T, stringsAsFactors = F)
@@ -121,7 +121,6 @@ list_of_results_indicators_national <-  from_analysisplan_map_to_output(df,
                                                                         questionnaire = questionnaire, confidence_level = 0.90)
 end_time <- Sys.time()                                                                                                                      #timer
 end_time - start_time                                                                                                                       #timer
-#34 min for 15%, estimate 4h, was true
 
 #save results as R file and get it 
 list_of_results_indicators_national %>% saveRDS("output/list_of_results_indicators_national.RDS")
@@ -164,7 +163,6 @@ list_of_results_indicators_national_settlement <-  from_analysisplan_map_to_outp
                                                              questionnaire = questionnaire, confidence_level = 0.90)
 end_time <- Sys.time()                                                                                                                      #timer
 end_time - start_time                                                                                                                       #timer
-#34 min for 15%, estimate 4h, was true
 
 #save results as R file and get it 
 list_of_results_indicators_national_settlement %>% saveRDS("output/list_of_results_indicators_national_settlement.RDS")
@@ -172,7 +170,7 @@ list_of_results_indicators_national_settlement %>% saveRDS("output/list_of_resul
 
 #get table of results and save as csv
 big_table_indicators_national_settlement <- list_of_results_indicators_national_settlement$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
-write.csv(big_table_indicators_national, file= paste0("output/big_table_indicators_national_settlement.csv"), row.names=FALSE)
+write.csv(big_table_indicators_national_settlement, file= paste0("output/big_table_indicators_national_settlement.csv"), row.names=FALSE)
 
 #get table with p-values and F-statistic (if not only direct reporting)
 #pval_table(list_of_results_indicators_national_settlement$results, "output/list_of_results_indicators_hypo_national_settlement.csv")
@@ -189,19 +187,18 @@ hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_nation
                                                filename = "list_of_results_indicators_national_settlement.html")
 
 
-
 #####################################
 ##########REPEAT FOR STATES##########
 #####################################
 
 dap_states<-dap_indicators
-dap_states$repeat.for.variable<-"states"
+dap_states$repeat.for.variable<-"state"
 
 
 #results-function (can take very long)
 start_time <- Sys.time()                                                                                                                    #timer for fun
 list_of_results_indicators_state <-  from_analysisplan_map_to_output(df,
-                                                          analysisplan = dap_indicators_state,
+                                                          analysisplan = dap_states,
                                                           weighting = weight.function,
                                                           cluster_variable_name = NULL,
                                                           questionnaire = questionnaire, confidence_level = 0.90)
@@ -236,13 +233,13 @@ hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_state,
 #####################################
 
 dap_states_settlement<-dap_indicators
-dap_states_settlement$repeat.for.variable<-"states"
+dap_states_settlement$repeat.for.variable<-"state"
 dap_states_settlement$independent.variable<-"settlement_type"
 dap_states_settlement$independent.variable.type<-"categorical"
 
 #results-function (can take very long)
 start_time <- Sys.time()                                                                                                                    #timer for fun
-list_of_results_indicators_state <-  from_analysisplan_map_to_output(df,
+list_of_results_indicators_state_settlement <-  from_analysisplan_map_to_output(df,
                                                                      analysisplan = dap_states_settlement,
                                                                      weighting = weight.function,
                                                                      cluster_variable_name = NULL,
@@ -343,7 +340,7 @@ list_of_results_indicators_region_settlement %>% saveRDS("output/list_of_results
 
 #get table of results and save as csv
 big_table_indicators_region_settlement <- list_of_results_indicators_region_settlement$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
-write.csv(big_table_indicators_region, file= paste0("output/big_table_indicators_region_settlement.csv"), row.names=FALSE)
+write.csv(big_table_indicators_region_settlement, file= paste0("output/big_table_indicators_region_settlement.csv"), row.names=FALSE)
 
 #get table with p-values and F-statistic (if not only direct reporting)
 #pval_table(list_of_results_indicators_region_settlement$results, "output/list_of_results_indicators_hypo_region_settlement.csv")
@@ -359,3 +356,43 @@ hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_region
                                                dir ="output",
                                                filename = "list_of_results_indicators_region_settlement.html")
 
+######################################
+#########REPEAT FOR DISTRICTS#########
+######################################
+
+dap_district<-dap_indicators
+dap_district$repeat.for.variable<-"district"
+
+#results-function (can take very long)
+start_time <- Sys.time()                                                                                                                    #timer for fun
+list_of_results_indicators_district <-  from_analysisplan_map_to_output(df,
+                                                                        analysisplan = dap_district,
+                                                                        weighting = weight.function,
+                                                                        cluster_variable_name = NULL,
+                                                                        questionnaire = questionnaire, confidence_level = 0.90)
+end_time <- Sys.time()                                                                                                                      #timer
+end_time - start_time                                                                                                                       #timer
+#34 min for 15%, estimate 4h, was true
+
+
+#save results as R file and get it 
+list_of_results_indicators_district %>% saveRDS("output/list_of_results_indicators_district.RDS")
+#list_of_results_indicators_district <- readRDS("output/list_of_results_indicators_district.RDS")
+
+#get table of results and save as csv
+big_table_indicators_district <- list_of_results_indicators_district$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
+write.csv(big_table_indicators_district, file= paste0("output/big_table_indicators_district.csv"), row.names=FALSE)
+
+#get table with p-values and F-statistic (if not only direct reporting)
+#pval_table(list_of_results_indicators_district$results, "output/list_of_results_indicators_hypo_district.csv")
+
+#get html output
+hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_district,
+                                               render_result_with = hypegrammaR:::from_result_map_to_md_table,
+                                               by_analysisplan_columns = c("dependent.var","repeat.var.value"),
+                                               by_prefix =  c("",""),
+                                               level = 2,
+                                               questionnaire = questionnaire,
+                                               label_varnames = TRUE,
+                                               dir ="output",
+                                               filename = "list_of_results_indicators_district.html")
