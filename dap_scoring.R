@@ -62,7 +62,7 @@ agg_binary<-function(x){
 #input: one data frame with non-critical, one with only critical indicators (non-critical,critical)
 #output: one score per household 1-4+, NA
 #_______________________________________________________________________________________________________________________________________________________________________________________
-agg_max<-function(x,y){
+agg_LSG<-function(x,y){
   y[y=="4+"]<-5                                                                     #recode 4+ to 5
   for (i in 1:dim(y)[2]){
     if (length(which(y[i]==0))!=0)                                                  #loop over columns of critical indicators
@@ -302,7 +302,7 @@ df$F2[df$hand_washing_facility=="no_specific"]<-1
 df$F3<- rep(NA, nrow(df))
 df$F3[df$health_time=="less15"|df$health_time=="16_30"|df$health_time=="31_60"]<-1
 df$F3[df$health_transport=="car"|df$health_transport=="cart"|df$health_transport=="moto"|df$health_transport=="bus"]<-1
-df$F3[(df$health_transport=="walking"|df$health_transport=="have_not"|df$health_transport=="treatment_toofar") & (df$health_time=="60_180"|df$health_time=="above180")]<-4
+df$F3[df$health_transport=="walking" & (df$health_time=="60_180"|df$health_time=="above180")]<-4
 
 df$F4<- rep(NA, nrow(df))
 df$F4[df$market_time=="less15"|df$market_time=="min_15_29"|df$market_time=="min_30_59"]<-0
@@ -385,7 +385,7 @@ df$G11[df$HH_schoolaged_children>0 & df$school_barrier_girls_note.security_conce
 
 df_G_bin<-data.frame(df$G5, df$G6, df$G7)
 df_G_crit<-data.frame(df$G1, df$G10, df$G11)
-df$LSG_education<-agg_max(df_G_bin,df_G_crit)
+df$LSG_education<-agg_LSG(df_G_bin,df_G_crit)
 
 #_________________________________________________________________________________
 
@@ -444,7 +444,7 @@ df$H10[df$barriers_health.medical_refused==1 | df$barriers_health.no_pwd==1]<-4
 
 df_H_bin<-data.frame(df$H2, df$H3, df$H4, df$H5, df$H6, df$H10)
 df_H_crit<-data.frame(df$H1, df$H7, df$H8)
-df$LSG_health<-agg_max(df_H_bin,df_H_crit)
+df$LSG_health<-agg_LSG(df_H_bin,df_H_crit)
 
 #_________________________________________________________________________________
 
@@ -483,7 +483,7 @@ df$I6[df$nutrition_barriers.insecurity==1 | df$nutrition_barriers.inaccessible==
 
 df_I_bin<-data.frame(df$I2, df$I4, df$I5)
 df_I_crit<-data.frame(df$I1, df$I3, df$I6)
-df$LSG_nutrition<-agg_max(df_I_bin,df_I_crit)
+df$LSG_nutrition<-agg_LSG(df_I_bin,df_I_crit)
 
 #_________________________________________________________________________________
 
@@ -517,7 +517,7 @@ df$J4[(df$market_transport=="walking") & (df$market_time=="hr_1_2"|df$market_tim
 
 df_J_bin<-data.frame(df$J4)
 df_J_crit<-data.frame(df$J1, df$J2, df$J3)
-df$LSG_FSC<-agg_max(df_J_bin,df_J_crit)
+df$LSG_FSC<-agg_LSG(df_J_bin,df_J_crit)
 
 #_________________________________________________________________________________
 
@@ -525,7 +525,7 @@ df$LSG_FSC<-agg_max(df_J_bin,df_J_crit)
 ######water sanitation & hygiene [WASH] ##############################################################################################################################
 
 df$K1<- rep(NA, nrow(df))
-df$K1[(df$water_source_time=="water_premises" | df$water_source_time=="less_5_min" | df$water_source_time=="between_and_15_min" |df$water_source_time=="between_and_30_min") & (df$water_source=="public_tap" | df$water_source=="handpumps_Handpump"| df$water_source=="protected_well"| df$water_source=="piped_neighbors"| df$water_source=="protected_Protected"| df$water_source=="bottled_water"| df$water_source=="private_tap")]<-1
+df$K1[(df$water_source_time=="water_premises" | df$water_source_time=="less_5_min" | df$water_source_time=="between_and_15_min" |df$water_source_time=="between_and_30_min") & (df$water_source=="public_tap" | df$water_source=="handpumps_Handpump"| df$water_source=="protected_well"| df$water_source=="piped_neighbors"| df$water_source=="protected_Protected"| df$water_source=="bottled_water"| df$water_source=="private_tap"| df$water_source=="neighbourhood_support")]<-1
 df$K1[df$water_source_time=="more_31min"| df$water_source=="unprotected_well" | df$water_source=="water_seller"| df$water_source=="unprotected_spring"| df$water_source=="rain_water"| df$water_source=="tanker_Tanker"]<-3
 df$K1[df$water_source=="surface_dam"]<-"4+"
 
@@ -603,7 +603,7 @@ df$K13[df$menstrual_barriers.no_access==1 | df$menstrual_barriers.no_money==1]<-
 
 df_K_bin<-data.frame(df$K3, df$K9, df$K6, df$K10, df$K11, df$K12, df$K7, df$K13)
 df_K_crit<-data.frame(df$K1, df$K2, df$K4, df$K5, df$K8)
-df$LSG_WASH<-agg_max(df_K_bin,df_K_crit)
+df$LSG_WASH<-agg_LSG(df_K_bin,df_K_crit)
 
 #_________________________________________________________________________________
 
@@ -657,16 +657,16 @@ df$L10[which(df$hlp_problems.none==1 & df$hlp_problems.not_sure==1)]<-NA
 df$L11<- rep(NA, nrow(df))
 df$L11[df$no_nfi_items==28]<-1
 df$L11[df$no_nfi_items<28 & df$no_nfi_items>4]<-2
-df$L11[df$no_nfi_items==4]<-3
-df$L11[df$no_nfi_items<4]<-4
+df$L11[df$no_nfi_items<5 & df$no_nfi_items>1]<-3
+df$L11[df$no_nfi_items<2]<-4
 
 #L12: not scored: length(dot_multiples("shetler_support[.]",df))
 
 #____________________________aggregate to sectoral LSG____________________________
 
-df_L_bin<-data.frame(df$L3, df$L6, df$L8, df$L9, df$L10)
-df_L_crit<-data.frame(df$L1, df$L2, df$L4, df$L11)
-df$LSG_SNFI<-agg_max(df_L_bin,df_L_crit)
+df_L_bin<-data.frame(df$L3, df$L6, df$L8, df$L9, df$L10, df$L1)
+df_L_crit<-data.frame(df$L2, df$L4, df$L11)
+df$LSG_SNFI<-agg_LSG(df_L_bin,df_L_crit)
 
 #_________________________________________________________________________________
 
@@ -674,8 +674,8 @@ df$LSG_SNFI<-agg_max(df_L_bin,df_L_crit)
 ######protection######################################################################################################################################################
 
 df$M1<- rep(NA, nrow(df))
-df$M1[df$child_labor_note=="no"]<-1
-df$M1[df$child_labor_note=="yes"]<-3
+df$M1[df$child_labor_note=="no" & df$HH_schoolaged_children>0]<-1
+df$M1[df$child_labor_note=="yes" &df$HH_schoolaged_children>0]<-3
 
 df$M2<- rep(NA, nrow(df))
 df$M2[df$children_away=="no"]<-1
@@ -728,7 +728,7 @@ df$M12[df$medical_services=="no"]<-1
 
 df_M_bin<-data.frame(df$M9, df$M10, df$M12, df$M6, df$M4, df$M11)
 df_M_crit<-data.frame(df$M1, df$M8, df$M2, df$M3)
-df$LSG_protection<-agg_max(df_M_bin,df_M_crit)
+df$LSG_protection<-agg_LSG(df_M_bin,df_M_crit)
 
 #_________________________________________________________________________________
 
@@ -787,7 +787,6 @@ df$N7[df$aid_barriers.insecure_route==1 |df$aid_barriers.insecure_site==1 | df$a
 ####################################################################################################################################################################################################################################################################################################
 
 CG<-c("G2", "G4", "J3", "K9", "K11", "K12", "M1", "M2")
-#df_CG<-data.frame(df$G2, df$G4, df$J3, df$K9, df$K11, df$K12,df$M1, df$M2)
 df_CG<-df[CG]
 df_CG_recoded<-re_code(df_CG)
 df<-cbind(df, df_CG_recoded)
@@ -805,4 +804,5 @@ today <- Sys.Date()
 today<-format(today, format="_%Y_%b_%d")
 
 write.csv(df, paste0("output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored",today,".csv"), row.names=FALSE)
+#write.csv(df_MSNI, paste0("output/MSNI_LSG",today,".csv"), row.names=FALSE)
 
