@@ -104,10 +104,53 @@ dev.off()
 
 
 #don't have a coping gap index (capacity gap) so far
-msni19::venn_msni(jmcna, #hno,
-                  lsg = LSG, #c("Sev..score.IPC", "Sev...score.GAM", "Sev.score..Access.to.an.improved.water.source", "Sev.score..Access.to.a.sufficient.quantity.of.water", "Sev.score..Access.to.adequate..appropriate.and.functional.sanitation.facilities", "Sev..score.HFCs"),
-                  capacity_gaps = "K9_CG", #Sev..score.IPC",
-                  weighting_function = weighting_function,
-                  print_plot = T,
-                  plot_name = "LSG_CG_K9_venn",
-                  path = "output/graphs")
+#msni19::venn_msni(jmcna, #hno,
+#                  lsg = LSG, #c("Sev..score.IPC", "Sev...score.GAM", "Sev.score..Access.to.an.improved.water.source", "Sev.score..Access.to.a.sufficient.quantity.of.water", "Sev.score..Access.to.adequate..appropriate.and.functional.sanitation.facilities", "Sev..score.HFCs"),
+#                  capacity_gaps = "K9_CG", #Sev..score.IPC",
+#                  weighting_function = weighting_function,
+#                  print_plot = T,
+#                  plot_name = "LSG_CG_K9_venn",
+#                  path = "output/graphs")
+
+
+##########################
+#####JUST FOR 4 an 4+#####
+##########################
+
+inter2<- index_intersections(
+  jmcna, #hno,
+  lsg = LSG, 
+  #c("Sev..score.IPC", "Sev...score.GAM", "Sev.score..Access.to.an.improved.water.source", "Sev.score..Access.to.a.sufficient.quantity.of.water", "Sev.score..Access.to.adequate..appropriate.and.functional.sanitation.facilities", "Sev..score.HFCs"),
+  lsg_labels = c("Education", "Health", "Nutrition","FSC", "WASH",  "SNFI", "Protection"),
+  y_label = "% in need per combination of sectors",
+  index_filter = c(4, 5),
+  weighting_function = weighting_function,
+  #nintersects = 12,
+  exclude_unique = T,
+  mutually_exclusive_sets = T,
+  round_to_1_percent = T,
+  print_plot = F,
+  plot_name = "intersection"
+)
+pdf("output/graphs/LSG_intersection_4s.pdf", width = 5, height = 4)
+inter2
+dev.off()
+
+#no argument index filter. therefore:
+jmcna[LSG][jmcna[LSG]==3]<-2
+
+radar2<- msni19::radar_graph(jmcna,
+                            lsg = LSG, 
+                            lsg_labels = c("Education", "Health", "Nutrition","FSC", "WASH",  "SNFI", "Protection"),
+                            group = "settlement_type",
+                            group_order = c("IDP","HC"),
+                            group_labels =  c("IDP","HC"),
+                            weighting_function = weighting_function,
+                            legend_position = "left",
+                            print_plot = F,
+                            plot_name = "LSG_radar"
+)
+
+pdf("output/graphs/LSG_radar_4s.pdf", width = 6, height = 4)
+radar2
+dev.off()
