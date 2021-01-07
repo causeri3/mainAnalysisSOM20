@@ -231,14 +231,14 @@ df$A5[(child_elderly/adultish)>=0.8]<-1
 ######socioeconomic###################################################################################################################################################
 
 df$B1<- rep(NA, nrow(df))
-df$B1[df$income_src.business=="1" | df$income_src.cash_fishing=="1" |df$income_src.livestock_production=="1" | df$income_src.contracted_job=="1"|df$income_src.cash_crop_farming=="1" | df$income_src.rent_of_land=="1"]<-1
-df$B1[df$income_src.subsistence_farming_or_fishing=="1" |df$income_src.remittances=="1"| df$income_src.daily_labour]<-3
-df$B1[df$income_src.humanitarian_assistance=="1"|df$income_src.sale_of_humanitarian_assistance=="1" | df$income_src.none=="1"]<-4
+df$B1[df$income_src.business==1 | df$income_src.cash_fishing==1 |df$income_src.livestock_production==1 | df$income_src.contracted_job==1|df$income_src.cash_crop_farming==1 | df$income_src.rent_of_land==1]<-1
+df$B1[df$income_src.subsistence_farming_or_fishing==1 |df$income_src.remittances==1| df$income_src.daily_labour==1]<-3
+df$B1[df$income_src.humanitarian_assistance==1|df$income_src.sale_of_humanitarian_assistance==1 | df$income_src.none==1]<-4
 
 df$B2<- rep(NA, nrow(df))
-df$B2[df$main_source_food.purchased_market=="1" | df$main_source_food.own_cultivation=="1" |df$main_source_food.own_livestock=="1"]<-1
-df$B2[df$main_source_food.bartering_Bartering=="1" | df$main_source_food.fishing_Fishing=="1" |df$main_source_food.foraging_Foraging=="1" | df$main_source_food.hunting_Hunting=="1"| df$main_source_food.other=="1"]<-3
-df$B2[df$main_source_food.reliant_friends=="1" | df$main_source_food.reliant_assistance=="1"| df$main_source_food.reliant_gov_assist=="1"]<-4
+df$B2[df$main_source_food.purchased_market==1 | df$main_source_food.own_cultivation==1 |df$main_source_food.own_livestock==1]<-1
+df$B2[df$main_source_food.bartering_Bartering==1 | df$main_source_food.fishing_Fishing==1 |df$main_source_food.foraging_Foraging==1 | df$main_source_food.hunting_Hunting==1| df$main_source_food.other==1]<-3
+df$B2[df$main_source_food.reliant_friends==1 | df$main_source_food.reliant_assistance==1| df$main_source_food.reliant_gov_assist==1]<-4
 
 df$B3<- rep(NA, nrow(df))
 df$B3[df$hh_members_new_unemployed==0]<-0
@@ -249,11 +249,10 @@ df$B4[df$hh_members_income>0]<-0
 df$B4[df$hh_members_income==0]<-1
 
 df$B5<- rep(NA, nrow(df))
-df$B5[df$employ_loss_why.end_contract=="1" | df$employ_loss_why.other=="1"]<-1
-df$B5[df$employ_loss_why.displacement=="1" | df$employ_loss_why.locusts=="1" |df$employ_loss_why.covid=="1" | df$employ_loss_why.ill=="1"]<-3
-df$B5[df$employ_loss_why.floodings=="1" | df$employ_loss_why.drought=="1"]<-4
-df$B5[df$employ_loss_why.conflict=="1"]<-"4+"
-
+df$B5[df$employ_loss_why.end_contract==1 | df$employ_loss_why.other==1]<-2
+df$B5[df$employ_loss_why.displacement==1 | df$employ_loss_why.locusts==1 |df$employ_loss_why.covid==1 | df$employ_loss_why.ill==1]<-3
+df$B5[df$employ_loss_why.flooding==1 | df$employ_loss_why.drought==1]<-4
+df$B5[df$employ_loss_why.conflict==1]<-"4+"
 
 ######displacement####################################################################################################################################################
 
@@ -420,7 +419,7 @@ df$H6[df$birth_where=="respondent_s" | df$birth_where=="other_home" ]<-1
 df$H7<- rep(NA, nrow(df))
 df$H7[df$who_assist=="government_hospital" | df$who_assist=="government_clinic" | df$who_assist=="other_health" | df$who_assist=="traditional" | df$who_assist=="community"]<-1
 df$H7[df$who_assist=="relative" | df$who_assist=="other" ]<-3
-df$H7[df$who_assist=="no" ]<-4
+df$H7[df$who_assist=="no" ]<-"4+"
 
 df$H8<- rep(NA, nrow(df))
 df$H8[df$health_time=="less15"|df$health_time=="16_30"|df$health_time=="31_60"]<-1
@@ -534,8 +533,10 @@ df$K2[df$enough_water.drinking==1]<-1
 df$K2[df$enough_water.drinking==0]<-4
 
 df$K3<- rep(NA, nrow(df))
-df$K3[df$enough_water.drinking==1 & df$enough_water.cooking==1 & df$enough_water.personal_hygiene_==1 & df$enough_water.other__domestic_purposes_==1 & df$enough_water.not_enough_water_==0]<-0
-df$K3[df$enough_water.other__domestic_purposes_==0 | df$enough_water.personal_hygiene_==0 | df$enough_water.cooking==0]<-1
+df$K3[df$enough_water.drinking==1 & df$enough_water.cooking==1 & df$enough_water.personal_hygiene_==1 & df$enough_water.other__domestic_purposes_==1 & df$enough_water.not_enough_water_==0]<-1
+df$K3[df$enough_water.other__domestic_purposes_==0] <-2
+df$K3[df$enough_water.personal_hygiene_==0] <-3
+df$K3[df$enough_water.cooking==0] <-4
 df$K3[which(df$enough_water.not_enough_water_==1 & (df$enough_water.drinking==1 | df$enough_water.cooking==1 | df$enough_water.personal_hygiene_==1 | df$enough_water.other__domestic_purposes_==1))]<-NA
 #ran into issues, see above, 244 survey getting NA due to inconsistency and see below:
 #which(is.na(df$K3)&df$enough_water.not_enough_water_==0)         #75 NA surveys no drinking water, covered by K2
