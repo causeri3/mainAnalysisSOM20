@@ -5,7 +5,7 @@ library(dplyr)
 setwd("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/GitHub/mainAnalysisSOM20")
 
 #import all necessary files (data set, dap, sampling frame, choices and questions from kobo-tool)
-df<-read.csv(file="output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored_2021_Jan_06.csv", head=T, dec=".", sep=",", stringsAsFactors = F)
+df<-read.csv(file="output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored_2021_Jan_07.csv", head=T, dec=".", sep=",", stringsAsFactors = F)
 sf<-read.csv(file="input/sampling_frame.csv", head=T, dec=".", sep=",", stringsAsFactors = F)         #from population_patching_and_weighting.R
 kobochoices <- read.csv("input/choices.csv", header = T, stringsAsFactors = F)
 koboquestions <- read.csv("input/questions.csv", header = T, stringsAsFactors = F)
@@ -74,7 +74,7 @@ for (i in 1:length(indicators)){
 #adapt naming to hypegrammaR-style
 dap_indicators$dependent.variable<-hypegrammaR:::to_alphanumeric_lowercase(dap_indicators$dependent.variable)
 
-##############SKIP FUNCTIONS FOR DIRECT REPORTING#################################################################################################################################################
+##############SKIP FUNCTIONS FOR DIRECT REPORTING###########################################################################################################################
 
 #################
 ### FUNCTIONS ###
@@ -246,7 +246,6 @@ list_of_results_indicators_state_settlement <-  from_analysisplan_map_to_output(
                                                                      questionnaire = questionnaire, confidence_level = 0.90)
 end_time <- Sys.time()                                                                                                                      #timer
 end_time - start_time                                                                                                                       #timer
-#34 min for 15%, estimate 4h, was true
 
 
 #save results as R file and get it 
@@ -288,7 +287,6 @@ list_of_results_indicators_region <-  from_analysisplan_map_to_output(df,
                                                           questionnaire = questionnaire, confidence_level = 0.90)
 end_time <- Sys.time()                                                                                                                      #timer
 end_time - start_time                                                                                                                       #timer
-#34 min for 15%, estimate 4h, was true
 
 
 #save results as R file and get it 
@@ -331,7 +329,6 @@ list_of_results_indicators_region_settlement <-  from_analysisplan_map_to_output
                                                                                  questionnaire = questionnaire, confidence_level = 0.90)
 end_time <- Sys.time()                                                                                                                      #timer
 end_time - start_time                                                                                                                       #timer
-#34 min for 15%, estimate 4h, was true
 
 
 #save results as R file and get it 
@@ -372,7 +369,7 @@ list_of_results_indicators_district <-  from_analysisplan_map_to_output(df,
                                                                         questionnaire = questionnaire, confidence_level = 0.90)
 end_time <- Sys.time()                                                                                                                      #timer
 end_time - start_time                                                                                                                       #timer
-#34 min for 15%, estimate 4h, was true
+#12.35h
 
 
 #save results as R file and get it 

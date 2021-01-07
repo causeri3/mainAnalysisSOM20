@@ -11,7 +11,7 @@ sessionInfo()
 #set working directory
 setwd("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/GitHub/mainAnalysisSOM20")
 
-jmcna<-read.csv(file="output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored_2021_Jan_06.csv", head=T, dec=".", sep=",", stringsAsFactors = F)
+jmcna<-read.csv(file="output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored_2021_Jan_07.csv", head=T, dec=".", sep=",", stringsAsFactors = F)
 sf<-read.csv(file="input/sampling_frame.csv", head=T, dec=".", sep=",", stringsAsFactors = F)
 #hno<-read.csv(file= "C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/_2020_Oct_11reduced_joined_hno_ind.csv", head=T, dec=".", sep=",", stringsAsFactors = F)
 
