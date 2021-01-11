@@ -204,8 +204,8 @@ list_of_results_state %>% saveRDS("output/list_of_results_state.RDS")
 long_table_state <- list_of_results_state$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
 
 #re-format wide and as % for data merge in InDesign (FactSheets)
-table_state<-long_table_state[c("dependent.var","dependent.var.value" , "independent.var.value" ,"repeat.var.value", "numbers")]
-wide_table_state<-dcast(data = table_state, formula = repeat.var.value + independent.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
+table_state<-long_table_state[c("dependent.var","dependent.var.value" ,"repeat.var.value", "numbers")]
+wide_table_state<-dcast(data = table_state, formula = repeat.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
 
 #export results as CSV files
 write.csv(wide_table_state, file= paste0("output/wide_table_state.csv"), row.names=FALSE)
@@ -301,8 +301,8 @@ list_of_results_region %>% saveRDS("output/list_of_results_region.RDS")
 long_table_region <- list_of_results_region$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
 
 #re-format wide and as % for data merge in InDesign (FactSheets)
-table_region<-long_table_region[c("dependent.var","dependent.var.value" , "independent.var.value" ,"repeat.var.value", "numbers")]
-wide_table_region<-dcast(data = table_region, formula = repeat.var.value + independent.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
+table_region<-long_table_region[c("dependent.var","dependent.var.value" ,"repeat.var.value", "numbers")]
+wide_table_region<-dcast(data = table_region, formula = repeat.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
 
 #export results as CSV files
 write.csv(wide_table_region, file= paste0("output/wide_table_region.csv"), row.names=FALSE)
@@ -398,8 +398,8 @@ list_of_results_district %>% saveRDS("output/list_of_results_district.RDS")
 long_table_district <- list_of_results_district$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
 
 #re-format wide and as % for data merge in InDesign (FactSheets)
-table_district<-long_table_district[c("dependent.var","dependent.var.value" , "independent.var.value" ,"repeat.var.value", "numbers")]
-wide_table_district<-dcast(data = table_district, formula = repeat.var.value + independent.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
+table_district<-long_table_district[c("dependent.var","dependent.var.value" ,"repeat.var.value", "numbers")]
+wide_table_district<-dcast(data = table_district, formula = repeat.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
 
 #export results as CSV files
 write.csv(wide_table_district, file= paste0("output/wide_table_district.csv"), row.names=FALSE)
