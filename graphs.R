@@ -13,8 +13,6 @@ setwd("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/GitHub/mainAnalysisSOM20"
 
 jmcna<-read.csv(file="output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored_2021_Jan_07.csv", head=T, dec=".", sep=",", stringsAsFactors = F)
 sf<-read.csv(file="input/sampling_frame.csv", head=T, dec=".", sep=",", stringsAsFactors = F)
-#hno<-read.csv(file= "C:/Users/Vanessa Causemann/Desktop/REACH/Data/myOutputs/_2020_Oct_11reduced_joined_hno_ind.csv", head=T, dec=".", sep=",", stringsAsFactors = F)
-
 
 #adjust data set to sampling frame formatting
 jmcna$settlement_type[jmcna$idp_settlement=="yes"]<-"IDP"
@@ -24,16 +22,6 @@ sf$stratum_id <- paste(sf$district, sf$settlement_type, sep = "_")
 jmcna$stratum_id <- paste(jmcna$district, jmcna$settlement_type, sep = "_")
 
 names(jmcna)[which(names(jmcna) == "weights")]<-"weights_tableau"
-
-#adjust data set to sampling frame formatting[HNO tests]
-#hno$settlement_type[hno$idp_settlement=="yes"]<-"IDP"
-#hno$settlement_type[hno$idp_settlement=="no"]<-"HC"
-
-#sf$stratum_id <- paste(sf$district, sf$settlement_type, sep = "_")
-#hno$stratum_id <- paste(hno$district, hno$settlement_type, sep = "_")
-
-#names(hno)[which(names(hno) == "weights")]<-"weights_tableau"
-
 
 weighting_function <- surveyweights::weighting_fun_from_samplingframe(sampling.frame = sf,
                                                                       data = jmcna,
@@ -47,11 +35,7 @@ LSG<-c("LSG_education", "LSG_health", "LSG_nutrition", "LSG_FSC", "LSG_WASH", "L
 
 #re-code LSG's to numeric 
 jmcna[LSG][jmcna[LSG]=="4+"]<-5
-
-for (i in 1:length(LSG)){
-  jmcna[LSG[i]]<-as.numeric(unlist(jmcna[LSG[i]]))
-}
-
+jmcna[LSG]<-lapply(jmcna[LSG],as.numeric)
 
 #plot_set_percentages is the generic function, the index_intesections is a wrapper around it and it calculates around the lsg specfically
 #plot_set_percentages(jmcna,#hno,
@@ -118,9 +102,8 @@ dev.off()
 ##########################
 
 inter2<- index_intersections(
-  jmcna, #hno,
+  jmcna,
   lsg = LSG, 
-  #c("Sev..score.IPC", "Sev...score.GAM", "Sev.score..Access.to.an.improved.water.source", "Sev.score..Access.to.a.sufficient.quantity.of.water", "Sev.score..Access.to.adequate..appropriate.and.functional.sanitation.facilities", "Sev..score.HFCs"),
   lsg_labels = c("Education", "Health", "Nutrition","FSC", "WASH",  "SNFI", "Protection"),
   y_label = "% in need per combination of sectors",
   index_filter = c(4, 5),
