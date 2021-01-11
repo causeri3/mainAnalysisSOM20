@@ -1,5 +1,6 @@
 library(hypegrammaR)
 library(dplyr)
+library(reshape2)
 
 #set working directory
 setwd("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/GitHub/mainAnalysisSOM20")
@@ -67,9 +68,7 @@ questionnaire<-load_questionnaire(data = df,
 #dap_indicators$dependent.variable %in% names(df)
 
 #make sure to only have character variables
-for (i in 1:length(indicators)){
-  df[indicators[i]]<-as.character(unlist(df[indicators[i]]))
-}
+df[indicators]<-lapply(df[indicators],as.character)
 
 #adapt naming to hypegrammaR-style
 dap_indicators$dependent.variable<-hypegrammaR:::to_alphanumeric_lowercase(dap_indicators$dependent.variable)
@@ -126,9 +125,16 @@ end_time - start_time                                                           
 list_of_results_indicators_national %>% saveRDS("output/list_of_results_indicators_national.RDS")
 #list_of_results_indicators_national <- readRDS("output/list_of_results_indicators_national.RDS")
 
-#get table of results and save as csv
-big_table_indicators_national <- list_of_results_indicators_national$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
-write.csv(big_table_indicators_national, file= paste0("output/big_table_indicators_national.csv"), row.names=FALSE)
+#get long table of results 
+long_table_indicators_national <- list_of_results_indicators_national$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
+#re-format wide and as % for data merge in InDesign (FactSheets)
+table_indicators_national<-long_table_indicators_national[c("dependent.var","dependent.var.value" ,"repeat.var.value", "numbers")]
+wide_table_perc_indicators_national<-dcast(data = table_indicators_national, formula = repeat.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
+wide_table_perc_indicators_national[2:length(wide_table_perc_indicators_national)]<-wide_table_perc_indicators_national[2:length(wide_table_perc_indicators_national)]*100
+
+#export results as CSV files
+write.csv(wide_table_perc_indicators_national, file= paste0("output/wide_table_perc_indicators_national.csv"), row.names=FALSE)
+write.csv(long_table_indicators_national, file= paste0("output/long_table_indicators_national.csv"), row.names=FALSE)
 
 #get table with p-values and F-statistic (if not only direct reporting)
 #pval_table(list_of_results_indicators_national$results, "output/list_of_results_indicators_hypo_national.csv")
@@ -168,9 +174,17 @@ end_time - start_time                                                           
 list_of_results_indicators_national_settlement %>% saveRDS("output/list_of_results_indicators_national_settlement.RDS")
 #list_of_results_indicators_national_settlement <- readRDS("output/list_of_results_indicators_national_settlement.RDS")
 
-#get table of results and save as csv
-big_table_indicators_national_settlement <- list_of_results_indicators_national_settlement$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
-write.csv(big_table_indicators_national_settlement, file= paste0("output/big_table_indicators_national_settlement.csv"), row.names=FALSE)
+#get long table of results 
+long_table_indicators_national_settlement <- list_of_results_indicators_national_settlement$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
+
+#re-format wide and as % for data merge in InDesign (FactSheets)
+table_indicators_national_settlement<-long_table_indicators_national_settlement[c("dependent.var","dependent.var.value" , "independent.var.value" ,"repeat.var.value", "numbers")]
+wide_table_perc_indicators_national_settlement<-dcast(data = table_indicators_national_settlement, formula = repeat.var.value + independent.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
+wide_table_perc_indicators_national_settlement[3:length(wide_table_perc_indicators_national_settlement)]<-wide_table_perc_indicators_national_settlement[3:length(wide_table_perc_indicators_national_settlement)]*100
+
+#export results as CSV files
+write.csv(wide_table_perc_indicators_national_settlement, file= paste0("output/wide_table_perc_indicators_national_settlement.csv"), row.names=FALSE)
+write.csv(long_table_indicators_national_settlement, file= paste0("output/long_table_indicators_national_settlement.csv"), row.names=FALSE)
 
 #get table with p-values and F-statistic (if not only direct reporting)
 #pval_table(list_of_results_indicators_national_settlement$results, "output/list_of_results_indicators_hypo_national_settlement.csv")
@@ -210,9 +224,16 @@ end_time - start_time                                                           
 list_of_results_indicators_state %>% saveRDS("output/list_of_results_indicators_state.RDS")
 #list_of_results_indicators_state <- readRDS("output/list_of_results_indicators_state.RDS")
 
-#get table of results and save as csv
-big_table_indicators_state <- list_of_results_indicators_state$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
-write.csv(big_table_indicators_state, file= paste0("output/big_table_indicators_state.csv"), row.names=FALSE)
+#get long table of results 
+long_table_indicators_state <- list_of_results_indicators_state$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
+#re-format wide and as % for data merge in InDesign (FactSheets)
+table_indicators_state<-long_table_indicators_state[c("dependent.var","dependent.var.value" ,"repeat.var.value", "numbers")]
+wide_table_perc_indicators_state<-dcast(data = table_indicators_state, formula = repeat.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
+wide_table_perc_indicators_state[2:length(wide_table_perc_indicators_state)]<-wide_table_perc_indicators_state[2:length(wide_table_perc_indicators_state)]*100
+
+#export results as CSV files
+write.csv(wide_table_perc_indicators_state, file= paste0("output/wide_table_perc_indicators_state.csv"), row.names=FALSE)
+write.csv(long_table_indicators_state, file= paste0("output/long_table_indicators_state.csv"), row.names=FALSE)
 
 #get table with p-values and F-statistic (if not only direct reporting)
 #pval_table(list_of_results_indicators_state$results, "output/list_of_results_indicators_hypo_state.csv")
@@ -252,9 +273,17 @@ end_time - start_time                                                           
 list_of_results_indicators_state_settlement %>% saveRDS("output/list_of_results_indicators_state_settlement.RDS")
 #list_of_results_indicators_state_settlement <- readRDS("output/list_of_results_indicators_state_settlement.RDS")
 
-#get table of results and save as csv
-big_table_indicators_state_settlement <- list_of_results_indicators_state_settlement$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
-write.csv(big_table_indicators_state_settlement, file= paste0("output/big_table_indicators_state_settlement.csv"), row.names=FALSE)
+#get long table of results 
+long_table_indicators_state_settlement <- list_of_results_indicators_state_settlement$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
+
+#re-format wide and as % for data merge in InDesign (FactSheets)
+table_indicators_state_settlement<-long_table_indicators_state_settlement[c("dependent.var","dependent.var.value" , "independent.var.value" ,"repeat.var.value", "numbers")]
+wide_table_perc_indicators_state_settlement<-dcast(data = table_indicators_state_settlement, formula = repeat.var.value + independent.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
+wide_table_perc_indicators_state_settlement[3:length(wide_table_perc_indicators_state_settlement)]<-wide_table_perc_indicators_state_settlement[3:length(wide_table_perc_indicators_state_settlement)]*100
+
+#export results as CSV files
+write.csv(wide_table_perc_indicators_state_settlement, file= paste0("output/wide_table_perc_indicators_state_settlement.csv"), row.names=FALSE)
+write.csv(long_table_indicators_state_settlement, file= paste0("output/long_table_indicators_state_settlement.csv"), row.names=FALSE)
 
 #get table with p-values and F-statistic (if not only direct reporting)
 #pval_table(list_of_results_indicators_state_settlement$results, "output/list_of_results_indicators_hypo_state_settlement.csv")
@@ -293,9 +322,17 @@ end_time - start_time                                                           
 list_of_results_indicators_region %>% saveRDS("output/list_of_results_indicators_region.RDS")
 #list_of_results_indicators_region <- readRDS("output/list_of_results_indicators_region.RDS")
 
-#get table of results and save as csv
-big_table_indicators_region <- list_of_results_indicators_region$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
-write.csv(big_table_indicators_region, file= paste0("output/big_table_indicators_region.csv"), row.names=FALSE)
+#get long table of results 
+long_table_indicators_region <- list_of_results_indicators_region$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
+
+#re-format wide and as % for data merge in InDesign (FactSheets)
+table_indicators_region<-long_table_indicators_region[c("dependent.var","dependent.var.value" ,"repeat.var.value", "numbers")]
+wide_table_perc_indicators_region<-dcast(data = table_indicators_region, formula = repeat.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
+wide_table_perc_indicators_region[2:length(wide_table_perc_indicators_region)]<-wide_table_perc_indicators_region[2:length(wide_table_perc_indicators_region)]*100
+
+#export results as CSV files
+write.csv(wide_table_perc_indicators_region, file= paste0("output/wide_table_perc_indicators_region.csv"), row.names=FALSE)
+write.csv(long_table_indicators_region, file= paste0("output/long_table_indicators_region.csv"), row.names=FALSE)
 
 #get table with p-values and F-statistic (if not only direct reporting)
 #pval_table(list_of_results_indicators_region$results, "output/list_of_results_indicators_hypo_region.csv")
@@ -335,9 +372,17 @@ end_time - start_time                                                           
 list_of_results_indicators_region_settlement %>% saveRDS("output/list_of_results_indicators_region_settlement.RDS")
 #list_of_results_indicators_region_settlement <- readRDS("output/list_of_results_indicators_region_settlement.RDS")
 
-#get table of results and save as csv
-big_table_indicators_region_settlement <- list_of_results_indicators_region_settlement$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
-write.csv(big_table_indicators_region_settlement, file= paste0("output/big_table_indicators_region_settlement.csv"), row.names=FALSE)
+#get long table of results 
+long_table_indicators_region_settlement <- list_of_results_indicators_region_settlement$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
+
+#re-format wide and as % for data merge in InDesign (FactSheets)
+table_indicators_region_settlement<-long_table_indicators_region_settlement[c("dependent.var","dependent.var.value" , "independent.var.value" ,"repeat.var.value", "numbers")]
+wide_table_perc_indicators_region_settlement<-dcast(data = table_indicators_region_settlement, formula = repeat.var.value + independent.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
+wide_table_perc_indicators_region_settlement[3:length(wide_table_perc_indicators_region_settlement)]<-wide_table_perc_indicators_region_settlement[3:length(wide_table_perc_indicators_region_settlement)]*100
+
+#export results as CSV files
+write.csv(wide_table_perc_indicators_region_settlement, file= paste0("output/wide_table_perc_indicators_region_settlement.csv"), row.names=FALSE)
+write.csv(long_table_indicators_region_settlement, file= paste0("output/long_table_indicators_region_settlement.csv"), row.names=FALSE)
 
 #get table with p-values and F-statistic (if not only direct reporting)
 #pval_table(list_of_results_indicators_region_settlement$results, "output/list_of_results_indicators_hypo_region_settlement.csv")
@@ -376,9 +421,17 @@ end_time - start_time                                                           
 list_of_results_indicators_district %>% saveRDS("output/list_of_results_indicators_district.RDS")
 #list_of_results_indicators_district <- readRDS("output/list_of_results_indicators_district.RDS")
 
-#get table of results and save as csv
-big_table_indicators_district <- list_of_results_indicators_district$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
-write.csv(big_table_indicators_district, file= paste0("output/big_table_indicators_district.csv"), row.names=FALSE)
+#get long table of results 
+long_table_indicators_district <- list_of_results_indicators_district$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
+
+#re-format wide and as % for data merge in InDesign (FactSheets)
+table_indicators_district<-long_table_indicators_district[c("dependent.var","dependent.var.value" ,"repeat.var.value", "numbers")]
+wide_table_perc_indicators_district<-dcast(data = table_indicators_district, formula = repeat.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
+wide_table_perc_indicators_district[2:length(wide_table_perc_indicators_district)]<-wide_table_perc_indicators_district[2:length(wide_table_perc_indicators_district)]*100
+
+#export results as CSV files
+write.csv(wide_table_perc_indicators_district, file= paste0("output/wide_table_perc_indicators_district.csv"), row.names=FALSE)
+write.csv(long_table_indicators_district, file= paste0("output/long_table_indicators_district.csv"), row.names=FALSE)
 
 #get table with p-values and F-statistic (if not only direct reporting)
 #pval_table(list_of_results_indicators_district$results, "output/list_of_results_indicators_hypo_district.csv")
@@ -393,3 +446,7 @@ hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_distri
                                                label_varnames = TRUE,
                                                dir ="output",
                                                filename = "list_of_results_indicators_district.html")
+
+
+
+#for settlement aggregation start with column 2 and take indepent variables into data set
