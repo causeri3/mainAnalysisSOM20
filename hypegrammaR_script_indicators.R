@@ -127,6 +127,7 @@ list_of_results_indicators_national %>% saveRDS("output/list_of_results_indicato
 
 #get long table of results 
 long_table_indicators_national <- list_of_results_indicators_national$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
+
 #re-format wide and as % for data merge in InDesign (FactSheets)
 table_indicators_national<-long_table_indicators_national[c("dependent.var","dependent.var.value" ,"repeat.var.value", "numbers")]
 wide_table_perc_indicators_national<-dcast(data = table_indicators_national, formula = repeat.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
@@ -226,6 +227,7 @@ list_of_results_indicators_state %>% saveRDS("output/list_of_results_indicators_
 
 #get long table of results 
 long_table_indicators_state <- list_of_results_indicators_state$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
+
 #re-format wide and as % for data merge in InDesign (FactSheets)
 table_indicators_state<-long_table_indicators_state[c("dependent.var","dependent.var.value" ,"repeat.var.value", "numbers")]
 wide_table_perc_indicators_state<-dcast(data = table_indicators_state, formula = repeat.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
@@ -446,7 +448,3 @@ hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_distri
                                                label_varnames = TRUE,
                                                dir ="output",
                                                filename = "list_of_results_indicators_district.html")
-
-
-
-#for settlement aggregation start with column 2 and take indepent variables into data set
