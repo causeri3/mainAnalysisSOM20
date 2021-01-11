@@ -6,7 +6,7 @@ library(reshape2)
 setwd("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/GitHub/mainAnalysisSOM20")
 
 #import data set
-df_original <- read.csv(file="output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored_2021_Jan_04.csv", head=T, dec=".", sep=",", na.strings=c(""," ","NA"))
+df_original <- read.csv(file="output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored_2021_Jan_07.csv", head=T, dec=".", sep=",", na.strings=c(""," ","NA"))
 
 #############################################################################################################################################################################################
 #########MAKE ADAPTIONS SPECIFIC TO YOUR DATA SET############################################################################################################################################
@@ -93,13 +93,17 @@ end_time - start_time                                                           
 
 #####JOIN TABLES AND FORMAT WIDE#####
 long_table<-rbind(long_table_idp,long_table_non_idp)                                                                    #join tables row-wise
-long_table$variables <- paste0(long_table$var_names,"-", as.character(long_table$Var1))                                 #add identifying column for making table wide
+long_table$variables <- paste0(long_table$var_names,"_", as.character(long_table$Var1))                                 #add identifying column for making table wide
 long<-long_table[,which(names(long_table)%in%c("area","settlement_type","variables","Freq"))]                           #get rid of not needed columns
 wide_table<-dcast(data = long, formula = area + settlement_type ~ variables, fun.aggregate = NULL, value.var = "Freq")  #convert to wide format
-index2<-which(grepl("-NA",names(wide_table)))                                                                           #get index of all columns containing "NA" in column name                                                                                                  #add the "_other" columns to the list of indexes which will be deleted          
+index2<-which(grepl("_NA",names(wide_table)))                                                                           #get index of all columns containing "NA" in column name                                                                                                  #add the "_other" columns to the list of indexes which will be deleted          
 wide_table<-wide_table[-index2]                                                                                         #subset without NA columns     
 
+#percent instead of frequencies for data merge in InDesign
+wide_table_perc<-wide_table
+wide_table_perc[3:length(wide_table_perc)]<-wide_table_perc[3:length(wide_table_perc)]*100
 
 #####EXPORT#####
 
-write.csv(wide_table,"output/frequency_means_table_indicators.csv", row.names=FALSE)
+write.csv(wide_table,"output/frequency_table_indicators_districts_settlement.csv", row.names=FALSE)
+write.csv(wide_table_perc,"output/percent_table_indicators_districts_settlement.csv", row.names=FALSE)
