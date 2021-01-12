@@ -134,8 +134,8 @@ wide_table_perc_indicators_national<-dcast(data = table_indicators_national, for
 wide_table_perc_indicators_national<-wide_table_perc_indicators_national[2:length(wide_table_perc_indicators_national)]*100
 
 #export results as CSV files
-write.csv(wide_table_perc_indicators_national, file= paste0("output/wide_table_perc_indicators_national.csv"), row.names=FALSE)
-write.csv(long_table_indicators_national, file= paste0("output/long_table_indicators_national.csv"), row.names=FALSE)
+write.csv(wide_table_perc_indicators_national, file= "output/wide_table_perc_indicators_national.csv", row.names=FALSE)
+write.csv(long_table_indicators_national, file= "output/long_table_indicators_national.csv", row.names=FALSE)
 
 #get table with p-values and F-statistic (if not only direct reporting)
 #pval_table(list_of_results_indicators_national$results, "output/list_of_results_indicators_hypo_national.csv")
@@ -185,8 +185,8 @@ wide_table_perc_indicators_national_settlement[3:length(wide_table_perc_indicato
 wide_table_perc_indicators_national_settlement<-wide_table_perc_indicators_national_settlement[2:length(wide_table_perc_indicators_national_settlement)]
 
 #export results as CSV files
-write.csv(wide_table_perc_indicators_national_settlement, file= paste0("output/wide_table_perc_indicators_national_settlement.csv"), row.names=FALSE)
-write.csv(long_table_indicators_national_settlement, file= paste0("output/long_table_indicators_national_settlement.csv"), row.names=FALSE)
+write.csv(wide_table_perc_indicators_national_settlement, file= "output/wide_table_perc_indicators_national_settlement.csv", row.names=FALSE)
+write.csv(long_table_indicators_national_settlement, file= "output/long_table_indicators_national_settlement.csv", row.names=FALSE)
 
 #get table with p-values and F-statistic (if not only direct reporting)
 #pval_table(list_of_results_indicators_national_settlement$results, "output/list_of_results_indicators_hypo_national_settlement.csv")
@@ -235,8 +235,8 @@ wide_table_perc_indicators_state<-dcast(data = table_indicators_state, formula =
 wide_table_perc_indicators_state[2:length(wide_table_perc_indicators_state)]<-wide_table_perc_indicators_state[2:length(wide_table_perc_indicators_state)]*100
 
 #export results as CSV files
-write.csv(wide_table_perc_indicators_state, file= paste0("output/wide_table_perc_indicators_state.csv"), row.names=FALSE)
-write.csv(long_table_indicators_state, file= paste0("output/long_table_indicators_state.csv"), row.names=FALSE)
+write.csv(wide_table_perc_indicators_state, file= "output/wide_table_perc_indicators_state.csv", row.names=FALSE)
+write.csv(long_table_indicators_state, file= "output/long_table_indicators_state.csv", row.names=FALSE)
 
 #get table with p-values and F-statistic (if not only direct reporting)
 #pval_table(list_of_results_indicators_state$results, "output/list_of_results_indicators_hypo_state.csv")
@@ -285,8 +285,8 @@ wide_table_perc_indicators_state_settlement<-dcast(data = table_indicators_state
 wide_table_perc_indicators_state_settlement[3:length(wide_table_perc_indicators_state_settlement)]<-wide_table_perc_indicators_state_settlement[3:length(wide_table_perc_indicators_state_settlement)]*100
 
 #export results as CSV files
-write.csv(wide_table_perc_indicators_state_settlement, file= paste0("output/wide_table_perc_indicators_state_settlement.csv"), row.names=FALSE)
-write.csv(long_table_indicators_state_settlement, file= paste0("output/long_table_indicators_state_settlement.csv"), row.names=FALSE)
+write.csv(wide_table_perc_indicators_state_settlement, file= "output/wide_table_perc_indicators_state_settlement.csv", row.names=FALSE)
+write.csv(long_table_indicators_state_settlement, file= "output/long_table_indicators_state_settlement.csv", row.names=FALSE)
 
 #get table with p-values and F-statistic (if not only direct reporting)
 #pval_table(list_of_results_indicators_state_settlement$results, "output/list_of_results_indicators_hypo_state_settlement.csv")
@@ -334,8 +334,8 @@ wide_table_perc_indicators_region<-dcast(data = table_indicators_region, formula
 wide_table_perc_indicators_region[2:length(wide_table_perc_indicators_region)]<-wide_table_perc_indicators_region[2:length(wide_table_perc_indicators_region)]*100
 
 #export results as CSV files
-write.csv(wide_table_perc_indicators_region, file= paste0("output/wide_table_perc_indicators_region.csv"), row.names=FALSE)
-write.csv(long_table_indicators_region, file= paste0("output/long_table_indicators_region.csv"), row.names=FALSE)
+write.csv(wide_table_perc_indicators_region, file= "output/wide_table_perc_indicators_region.csv", row.names=FALSE)
+write.csv(long_table_indicators_region, file= "output/long_table_indicators_region.csv", row.names=FALSE)
 
 #get table with p-values and F-statistic (if not only direct reporting)
 #pval_table(list_of_results_indicators_region$results, "output/list_of_results_indicators_hypo_region.csv")
@@ -384,8 +384,8 @@ wide_table_perc_indicators_region_settlement<-dcast(data = table_indicators_regi
 wide_table_perc_indicators_region_settlement[3:length(wide_table_perc_indicators_region_settlement)]<-wide_table_perc_indicators_region_settlement[3:length(wide_table_perc_indicators_region_settlement)]*100
 
 #export results as CSV files
-write.csv(wide_table_perc_indicators_region_settlement, file= paste0("output/wide_table_perc_indicators_region_settlement.csv"), row.names=FALSE)
-write.csv(long_table_indicators_region_settlement, file= paste0("output/long_table_indicators_region_settlement.csv"), row.names=FALSE)
+write.csv(wide_table_perc_indicators_region_settlement, file= "output/wide_table_perc_indicators_region_settlement.csv", row.names=FALSE)
+write.csv(long_table_indicators_region_settlement, file= "output/long_table_indicators_region_settlement.csv", row.names=FALSE)
 
 #get table with p-values and F-statistic (if not only direct reporting)
 #pval_table(list_of_results_indicators_region_settlement$results, "output/list_of_results_indicators_hypo_region_settlement.csv")
@@ -433,8 +433,8 @@ wide_table_perc_indicators_district<-dcast(data = table_indicators_district, for
 wide_table_perc_indicators_district[2:length(wide_table_perc_indicators_district)]<-wide_table_perc_indicators_district[2:length(wide_table_perc_indicators_district)]*100
 
 #export results as CSV files
-write.csv(wide_table_perc_indicators_district, file= paste0("output/wide_table_perc_indicators_district.csv"), row.names=FALSE)
-write.csv(long_table_indicators_district, file= paste0("output/long_table_indicators_district.csv"), row.names=FALSE)
+write.csv(wide_table_perc_indicators_district, file= "output/wide_table_perc_indicators_district.csv", row.names=FALSE)
+write.csv(long_table_indicators_district, file= "output/long_table_indicators_district.csv", row.names=FALSE)
 
 #get table with p-values and F-statistic (if not only direct reporting)
 #pval_table(list_of_results_indicators_district$results, "output/list_of_results_indicators_hypo_district.csv")
