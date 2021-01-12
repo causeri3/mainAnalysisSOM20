@@ -131,7 +131,7 @@ long_table_indicators_national <- list_of_results_indicators_national$results %>
 #re-format wide and as % for data merge in InDesign (FactSheets)
 table_indicators_national<-long_table_indicators_national[c("dependent.var","dependent.var.value" ,"repeat.var.value", "numbers")]
 wide_table_perc_indicators_national<-dcast(data = table_indicators_national, formula = repeat.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
-wide_table_perc_indicators_national[2:length(wide_table_perc_indicators_national)]<-wide_table_perc_indicators_national[2:length(wide_table_perc_indicators_national)]*100
+wide_table_perc_indicators_national<-wide_table_perc_indicators_national[2:length(wide_table_perc_indicators_national)]*100
 
 #export results as CSV files
 write.csv(wide_table_perc_indicators_national, file= paste0("output/wide_table_perc_indicators_national.csv"), row.names=FALSE)
@@ -182,6 +182,7 @@ long_table_indicators_national_settlement <- list_of_results_indicators_national
 table_indicators_national_settlement<-long_table_indicators_national_settlement[c("dependent.var","dependent.var.value" , "independent.var.value" ,"repeat.var.value", "numbers")]
 wide_table_perc_indicators_national_settlement<-dcast(data = table_indicators_national_settlement, formula = repeat.var.value + independent.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
 wide_table_perc_indicators_national_settlement[3:length(wide_table_perc_indicators_national_settlement)]<-wide_table_perc_indicators_national_settlement[3:length(wide_table_perc_indicators_national_settlement)]*100
+wide_table_perc_indicators_national_settlement<-wide_table_perc_indicators_national_settlement[2:length(wide_table_perc_indicators_national_settlement)]
 
 #export results as CSV files
 write.csv(wide_table_perc_indicators_national_settlement, file= paste0("output/wide_table_perc_indicators_national_settlement.csv"), row.names=FALSE)
