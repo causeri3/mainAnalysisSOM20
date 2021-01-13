@@ -5,6 +5,9 @@ library(reshape2)
 #set working directory
 setwd("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/GitHub/mainAnalysisSOM20")
 
+#import functions
+source("re-formatting_hypegrammaR.R")
+
 #import all necessary files (data set, dap, sampling frame, choices and questions from kobo-tool)
 df<-read.csv(file="output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored_2021_Jan_07.csv", head=T, dec=".", sep=",", stringsAsFactors = F)
 sf<-read.csv(file="input/sampling_frame.csv", head=T, dec=".", sep=",", stringsAsFactors = F)         #from population_patching_and_weighting.R
@@ -73,36 +76,6 @@ df[indicators]<-lapply(df[indicators],as.character)
 #adapt naming to hypegrammaR-style
 dap_indicators$dependent.variable<-hypegrammaR:::to_alphanumeric_lowercase(dap_indicators$dependent.variable)
 
-##############SKIP FUNCTIONS FOR DIRECT REPORTING###########################################################################################################################
-
-#################
-### FUNCTIONS ###
-#################
-
-# Getting and export table with p-value
-
-table_wrangling <- function(x) {
-  stats <- x[["summary.statistic"]]
-  pval_table <- as.data.frame(x[["hypothesis.test"]])
-  num_col = ncol(pval_table)
-  if (num_col != 5) {
-    if (num_col == 0) {
-      pval_table <- data.frame(F = NA, p.value = NA, ndf = NA, ddf = NA, name = NA)
-    } else {
-      pval_table <- full_join(data.frame(F = numeric(), p.value = numeric(), ndf = numeric(), ddf = numeric(), name = character()), pval_table)
-    }
-  } else {
-    names(pval_table) <- c("F", "p.value", "ndf", "ddf", "name")
-  }
-  cbind(stats, pval_table)
-}
-
-pval_table <- function(results, filename) {
-  lapply(results, table_wrangling) %>%
-    do.call(rbind, .) %>%
-    write.csv(filename, row.names = F)
-}
-
 ##########GET RESULTS AND SAVE IN DIFFERENT FORMATS########################################################################################################################
 
 #######################################
@@ -128,17 +101,10 @@ list_of_results_indicators_national %>% saveRDS("output/list_of_results_indicato
 #get long table of results 
 long_table_indicators_national <- list_of_results_indicators_national$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
 
-#re-format wide and as % for data merge in InDesign (FactSheets)
-table_indicators_national<-long_table_indicators_national[c("dependent.var","dependent.var.value" ,"repeat.var.value", "numbers")]
-wide_table_perc_indicators_national<-dcast(data = table_indicators_national, formula = repeat.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
-wide_table_perc_indicators_national<-wide_table_perc_indicators_national[2:length(wide_table_perc_indicators_national)]*100
-
 #export results as CSV files
-write.csv(wide_table_perc_indicators_national, file= "output/wide_table_perc_indicators_national.csv", row.names=FALSE)
 write.csv(long_table_indicators_national, file= "output/long_table_indicators_national.csv", row.names=FALSE)
-
-#get table with p-values and F-statistic (if not only direct reporting)
-#pval_table(list_of_results_indicators_national$results, "output/list_of_results_indicators_hypo_national.csv")
+write.csv(wide_table(long_table_indicators_national), file= "output/wide_table_indicators_national.csv", row.names=FALSE)
+write.csv(wide_perc(wide_table(long_table_indicators_national)), file= "output/wide_table_perc_indicators_national.csv", row.names=FALSE)
 
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_national,
@@ -178,18 +144,10 @@ list_of_results_indicators_national_settlement %>% saveRDS("output/list_of_resul
 #get long table of results 
 long_table_indicators_national_settlement <- list_of_results_indicators_national_settlement$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
 
-#re-format wide and as % for data merge in InDesign (FactSheets)
-table_indicators_national_settlement<-long_table_indicators_national_settlement[c("dependent.var","dependent.var.value" , "independent.var.value" ,"repeat.var.value", "numbers")]
-wide_table_perc_indicators_national_settlement<-dcast(data = table_indicators_national_settlement, formula = repeat.var.value + independent.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
-wide_table_perc_indicators_national_settlement[3:length(wide_table_perc_indicators_national_settlement)]<-wide_table_perc_indicators_national_settlement[3:length(wide_table_perc_indicators_national_settlement)]*100
-wide_table_perc_indicators_national_settlement<-wide_table_perc_indicators_national_settlement[2:length(wide_table_perc_indicators_national_settlement)]
-
 #export results as CSV files
-write.csv(wide_table_perc_indicators_national_settlement, file= "output/wide_table_perc_indicators_national_settlement.csv", row.names=FALSE)
 write.csv(long_table_indicators_national_settlement, file= "output/long_table_indicators_national_settlement.csv", row.names=FALSE)
-
-#get table with p-values and F-statistic (if not only direct reporting)
-#pval_table(list_of_results_indicators_national_settlement$results, "output/list_of_results_indicators_hypo_national_settlement.csv")
+write.csv(wide_table(long_table_indicators_national_settlement), file= "output/wide_table_indicators_national_settlement.csv", row.names=FALSE)
+write.csv(wide_perc(wide_table(long_table_indicators_national_settlement)), file= "output/wide_table_perc_indicators_national_settlement.csv", row.names=FALSE)
 
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_national_settlement,
@@ -229,17 +187,10 @@ list_of_results_indicators_state %>% saveRDS("output/list_of_results_indicators_
 #get long table of results 
 long_table_indicators_state <- list_of_results_indicators_state$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
 
-#re-format wide and as % for data merge in InDesign (FactSheets)
-table_indicators_state<-long_table_indicators_state[c("dependent.var","dependent.var.value" ,"repeat.var.value", "numbers")]
-wide_table_perc_indicators_state<-dcast(data = table_indicators_state, formula = repeat.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
-wide_table_perc_indicators_state[2:length(wide_table_perc_indicators_state)]<-wide_table_perc_indicators_state[2:length(wide_table_perc_indicators_state)]*100
-
 #export results as CSV files
-write.csv(wide_table_perc_indicators_state, file= "output/wide_table_perc_indicators_state.csv", row.names=FALSE)
 write.csv(long_table_indicators_state, file= "output/long_table_indicators_state.csv", row.names=FALSE)
-
-#get table with p-values and F-statistic (if not only direct reporting)
-#pval_table(list_of_results_indicators_state$results, "output/list_of_results_indicators_hypo_state.csv")
+write.csv(wide_table(long_table_indicators_state), file= "output/wide_table_indicators_state.csv", row.names=FALSE)
+write.csv(wide_perc(wide_table(long_table_indicators_state)), file= "output/wide_table_perc_indicators_state.csv", row.names=FALSE)
 
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_state,
@@ -279,17 +230,10 @@ list_of_results_indicators_state_settlement %>% saveRDS("output/list_of_results_
 #get long table of results 
 long_table_indicators_state_settlement <- list_of_results_indicators_state_settlement$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
 
-#re-format wide and as % for data merge in InDesign (FactSheets)
-table_indicators_state_settlement<-long_table_indicators_state_settlement[c("dependent.var","dependent.var.value" , "independent.var.value" ,"repeat.var.value", "numbers")]
-wide_table_perc_indicators_state_settlement<-dcast(data = table_indicators_state_settlement, formula = repeat.var.value + independent.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
-wide_table_perc_indicators_state_settlement[3:length(wide_table_perc_indicators_state_settlement)]<-wide_table_perc_indicators_state_settlement[3:length(wide_table_perc_indicators_state_settlement)]*100
-
 #export results as CSV files
-write.csv(wide_table_perc_indicators_state_settlement, file= "output/wide_table_perc_indicators_state_settlement.csv", row.names=FALSE)
 write.csv(long_table_indicators_state_settlement, file= "output/long_table_indicators_state_settlement.csv", row.names=FALSE)
-
-#get table with p-values and F-statistic (if not only direct reporting)
-#pval_table(list_of_results_indicators_state_settlement$results, "output/list_of_results_indicators_hypo_state_settlement.csv")
+write.csv(wide_table(long_table_indicators_state_settlement), file= "output/wide_table_indicators_state_settlement.csv", row.names=FALSE)
+write.csv(wide_perc(wide_table(long_table_indicators_state_settlement)), file= "output/wide_table_perc_indicators_state_settlement.csv", row.names=FALSE)
 
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_state_settlement,
@@ -328,17 +272,10 @@ list_of_results_indicators_region %>% saveRDS("output/list_of_results_indicators
 #get long table of results 
 long_table_indicators_region <- list_of_results_indicators_region$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
 
-#re-format wide and as % for data merge in InDesign (FactSheets)
-table_indicators_region<-long_table_indicators_region[c("dependent.var","dependent.var.value" ,"repeat.var.value", "numbers")]
-wide_table_perc_indicators_region<-dcast(data = table_indicators_region, formula = repeat.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
-wide_table_perc_indicators_region[2:length(wide_table_perc_indicators_region)]<-wide_table_perc_indicators_region[2:length(wide_table_perc_indicators_region)]*100
-
 #export results as CSV files
-write.csv(wide_table_perc_indicators_region, file= "output/wide_table_perc_indicators_region.csv", row.names=FALSE)
 write.csv(long_table_indicators_region, file= "output/long_table_indicators_region.csv", row.names=FALSE)
-
-#get table with p-values and F-statistic (if not only direct reporting)
-#pval_table(list_of_results_indicators_region$results, "output/list_of_results_indicators_hypo_region.csv")
+write.csv(wide_table(long_table_indicators_region), file= "output/wide_table_indicators_region.csv", row.names=FALSE)
+write.csv(wide_perc(wide_table(long_table_indicators_region)), file= "output/wide_table_perc_indicators_region.csv", row.names=FALSE)
 
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_region,
@@ -378,17 +315,10 @@ list_of_results_indicators_region_settlement %>% saveRDS("output/list_of_results
 #get long table of results 
 long_table_indicators_region_settlement <- list_of_results_indicators_region_settlement$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
 
-#re-format wide and as % for data merge in InDesign (FactSheets)
-table_indicators_region_settlement<-long_table_indicators_region_settlement[c("dependent.var","dependent.var.value" , "independent.var.value" ,"repeat.var.value", "numbers")]
-wide_table_perc_indicators_region_settlement<-dcast(data = table_indicators_region_settlement, formula = repeat.var.value + independent.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
-wide_table_perc_indicators_region_settlement[3:length(wide_table_perc_indicators_region_settlement)]<-wide_table_perc_indicators_region_settlement[3:length(wide_table_perc_indicators_region_settlement)]*100
-
 #export results as CSV files
-write.csv(wide_table_perc_indicators_region_settlement, file= "output/wide_table_perc_indicators_region_settlement.csv", row.names=FALSE)
 write.csv(long_table_indicators_region_settlement, file= "output/long_table_indicators_region_settlement.csv", row.names=FALSE)
-
-#get table with p-values and F-statistic (if not only direct reporting)
-#pval_table(list_of_results_indicators_region_settlement$results, "output/list_of_results_indicators_hypo_region_settlement.csv")
+write.csv(wide_table(long_table_indicators_region_settlement), file= "output/wide_table_indicators_region_settlement.csv", row.names=FALSE)
+write.csv(wide_perc(wide_table(long_table_indicators_region_settlement)), file= "output/wide_table_perc_indicators_region_settlement.csv", row.names=FALSE)
 
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_region_settlement,
@@ -427,17 +357,10 @@ list_of_results_indicators_district %>% saveRDS("output/list_of_results_indicato
 #get long table of results 
 long_table_indicators_district <- list_of_results_indicators_district$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
 
-#re-format wide and as % for data merge in InDesign (FactSheets)
-table_indicators_district<-long_table_indicators_district[c("dependent.var","dependent.var.value" ,"repeat.var.value", "numbers")]
-wide_table_perc_indicators_district<-dcast(data = table_indicators_district, formula = repeat.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
-wide_table_perc_indicators_district[2:length(wide_table_perc_indicators_district)]<-wide_table_perc_indicators_district[2:length(wide_table_perc_indicators_district)]*100
-
 #export results as CSV files
-write.csv(wide_table_perc_indicators_district, file= "output/wide_table_perc_indicators_district.csv", row.names=FALSE)
 write.csv(long_table_indicators_district, file= "output/long_table_indicators_district.csv", row.names=FALSE)
-
-#get table with p-values and F-statistic (if not only direct reporting)
-#pval_table(list_of_results_indicators_district$results, "output/list_of_results_indicators_hypo_district.csv")
+write.csv(wide_table(long_table_indicators_district), file= "output/wide_table_indicators_district.csv", row.names=FALSE)
+write.csv(wide_perc(wide_table(long_table_indicators_district)), file= "output/wide_table_perc_indicators_district.csv", row.names=FALSE)
 
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_indicators_district,
