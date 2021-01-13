@@ -11,6 +11,9 @@ library(reshape2)
 #set working directory
 setwd("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/GitHub/mainAnalysisSOM20")
 
+#import functions
+source("re-formatting_hypegrammaR.R")
+
 #import all necessary files (data set, dap, sampling frame, choices and questions from kobo-tool)
 jmcna<-read.csv(file="input/REACH_SOM2006_JMCNA_IV_Data-Set_August2020_October_27_2020.csv", head=T, dec=".", sep=",", stringsAsFactors = F)
 dap_state_settlement <- read.csv("input/dap_jmcna_all_var_state_settlement.csv", header = T, stringsAsFactors = F)
@@ -90,19 +93,10 @@ list_of_results_national %>% saveRDS("output/list_of_results_national.RDS")
 #get long table of results 
 long_table_national <- list_of_results_national$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
 
-#re-format wide and as % for data merge in InDesign (FactSheets)
-table_national<-long_table_national[c("dependent.var","dependent.var.value" ,"repeat.var.value", "numbers")]
-wide_table_national<-dcast(data = table_national, formula = repeat.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
-wide_table_national<-wide_table_national[2:length(wide_table_national)]
-#make frequencies to percentages
-index_n<-which(grepl("_NA",names(wide_table_national)))
-wide_table_national_perc<-wide_table_national
-wide_table_national_perc[-index_n] <-wide_table_national_perc[-index_n]*100  
-
 #export results as CSV files
-write.csv(wide_table_national, file= "output/wide_table_national.csv", row.names=FALSE)
 write.csv(long_table_national, file= "output/long_table_national.csv", row.names=FALSE)
-write.csv(wide_table_national_perc, file= "output/wide_table_perc_national.csv", row.names=FALSE)
+write.csv(wide_table(long_table_national), file= "output/wide_table_national.csv", row.names=FALSE)
+write.csv(wide_perc(wide_table(long_table_national)), file= "output/wide_table_perc_national.csv", row.names=FALSE)
 
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_national,
@@ -140,22 +134,10 @@ list_of_results_national_settlement %>% saveRDS("output/list_of_results_national
 #get long table of results 
 long_table_national_settlement <- list_of_results_national_settlement$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
 
-#re-format wide and as % for data merge in InDesign (FactSheets)
-table_national_settlement<-long_table_national_settlement[c("dependent.var","dependent.var.value" , "independent.var.value" ,"repeat.var.value", "numbers")]
-table_national_settlement[table_national_settlement=="NA"]<-NA
-wide_table_national_settlement<-dcast(data = table_national_settlement, formula = repeat.var.value + independent.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
-wide_table_national_settlement<-wide_table_national_settlement[2:length(wide_table_national_settlement)]
-
-#make frequencies to percentages
-index_n_s<-which(grepl("_NA",names(wide_table_national_settlement)))
-index_n_s<-c(index_n_s,  which(names(wide_table_national_settlement)=="independent.var.value"))
-wide_table_national_settlement_perc<-wide_table_national_settlement
-wide_table_national_settlement_perc[-index_n_s] <-wide_table_national_settlement_perc[-index_n_s]*100  
-
 #export results as CSV files
-write.csv(wide_table_national_settlement, file= "output/wide_table_national_settlement.csv", row.names=FALSE)
 write.csv(long_table_national_settlement, file= "output/long_table_national_settlement.csv", row.names=FALSE)
-write.csv(wide_table_national_settlement_perc, file= "output/wide_table_perc_national_settlement.csv", row.names=FALSE)
+write.csv(wide_table(long_table_national_settlement), file= "output/wide_table_national_settlement.csv", row.names=FALSE)
+write.csv(wide_perc(wide_table(long_table_national_settlement)), file= "output/wide_table_perc_national_settlement.csv", row.names=FALSE)
 
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_national_settlement,
@@ -196,21 +178,10 @@ list_of_results_state %>% saveRDS("output/list_of_results_state.RDS")
 #get long table of results 
 long_table_state <- list_of_results_state$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
 
-#re-format wide and as % for data merge in InDesign (FactSheets)
-table_state<-long_table_state[c("dependent.var","dependent.var.value" ,"repeat.var.value", "numbers")]
-table_state[table_state=="NA"]<-NA
-wide_table_state<-dcast(data = table_state, formula = repeat.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
-
-#make frequencies to percentages
-index_s<-which(grepl("_NA",names(wide_table_state)))
-index_s<-c(index_s, which(names(wide_table_state)=="repeat.var.value"))
-wide_table_state_perc<-wide_table_state
-wide_table_state_perc[-index_s] <-wide_table_state_perc[-index_s]*100  
-
 #export results as CSV files
-write.csv(wide_table_state, file= "output/wide_table_state.csv", row.names=FALSE)
 write.csv(long_table_state, file= "output/long_table_state.csv", row.names=FALSE)
-write.csv(wide_table_state_perc, file= "output/wide_table_perc_state.csv", row.names=FALSE)
+write.csv(wide_table(long_table_state), file= "output/wide_table_state.csv", row.names=FALSE)
+write.csv(wide_perc(wide_table(long_table_state)), file= "output/wide_table_perc_state.csv", row.names=FALSE)
 
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_state,
@@ -247,21 +218,10 @@ list_of_results_state_settlement %>% saveRDS("output/list_of_results_state_settl
 #get long table of results 
 long_table_state_settlement <- list_of_results_state_settlement$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
 
-#re-format wide and as % for data merge in InDesign (FactSheets)
-table_state_settlement<-long_table_state_settlement[c("dependent.var","dependent.var.value" , "independent.var.value" ,"repeat.var.value", "numbers")]
-table_state_settlement[table_state_settlement=="NA"]<-NA
-wide_table_state_settlement<-dcast(data = table_state_settlement, formula = repeat.var.value + independent.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
-
-#make frequencies to percentages
-index_s_s<-which(grepl("_NA",names(wide_table_state_settlement)))
-index_s_s<-c(index_s_s, which(names(wide_table_state_settlement)=="repeat.var.value"), which(names(wide_table_state_settlement)=="independent.var.value"))
-wide_table_state_settlement_perc<-wide_table_state_settlement
-wide_table_state_settlement_perc[-index_s_s] <-wide_table_state_settlement_perc[-index_s_s]*100  
-
 #export results as CSV files
-write.csv(wide_table_state_settlement, file= "output/wide_table_state_settlement.csv", row.names=FALSE)
 write.csv(long_table_state_settlement, file= "output/long_table_state_settlement.csv", row.names=FALSE)
-write.csv(wide_table_state_settlement_perc, file= "output/wide_table_perc_state_settlement.csv", row.names=FALSE)
+write.csv(wide_table(long_table_state_settlement), file= "output/wide_table_state_settlement.csv", row.names=FALSE)
+write.csv(wide_perc(wide_table(long_table_state_settlement)), file= "output/wide_table_perc_state_settlement.csv", row.names=FALSE)
 
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_state_settlement,
@@ -303,21 +263,10 @@ list_of_results_region %>% saveRDS("output/list_of_results_region.RDS")
 #get long table of results 
 long_table_region <- list_of_results_region$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
 
-#re-format wide and as % for data merge in InDesign (FactSheets)
-table_region<-long_table_region[c("dependent.var","dependent.var.value" ,"repeat.var.value", "numbers")]
-table_region[table_region=="NA"]<-NA
-wide_table_region<-dcast(data = table_region, formula = repeat.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
-
-#make frequencies to percentages
-index_r<-which(grepl("_NA",names(wide_table_region)))
-index_r<-c(index_r, which(names(wide_table_region)=="repeat.var.value"))
-wide_table_region_perc<-wide_table_region
-wide_table_region_perc[-index_r] <-wide_table_region_perc[-index_r]*100  
-
 #export results as CSV files
-write.csv(wide_table_region, file= "output/wide_table_region.csv", row.names=FALSE)
 write.csv(long_table_region, file= "output/long_table_region.csv", row.names=FALSE)
-write.csv(wide_table_region_perc, file= "output/wide_table_perc_region.csv", row.names=FALSE)
+write.csv(wide_table(long_table_region), file= "output/wide_table_region.csv", row.names=FALSE)
+write.csv(wide_perc(wide_table(long_table_region)), file= "output/wide_table_perc_region.csv", row.names=FALSE)
 
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_region,
@@ -357,21 +306,10 @@ list_of_results_region_settlement %>% saveRDS("output/list_of_results_region_set
 #get long table of results 
 long_table_region_settlement <- list_of_results_region_settlement$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
 
-#re-format wide and as % for data merge in InDesign (FactSheets)
-table_region_settlement<-long_table_region_settlement[c("dependent.var","dependent.var.value" , "independent.var.value" ,"repeat.var.value", "numbers")]
-table_region_settlement[table_region_settlement=="NA"]<-NA
-wide_table_region_settlement<-dcast(data = table_region_settlement, formula = repeat.var.value + independent.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
-
-#make frequencies to percentages
-index_r_s<-which(grepl("_NA",names(wide_table_region_settlement)))
-index_r_s<-c(index_r_s, which(names(wide_table_region_settlement)=="repeat.var.value"), which(names(wide_table_region_settlement)=="independent.var.value"))
-wide_table_region_settlement_perc<-wide_table_region_settlement
-wide_table_region_settlement_perc[-index_r_s] <-wide_table_region_settlement_perc[-index_r_s]*100  
-
 #export results as CSV files
-write.csv(wide_table_region_settlement, file= "output/wide_table_region_settlement.csv", row.names=FALSE)
 write.csv(long_table_region_settlement, file= "output/long_table_region_settlement.csv", row.names=FALSE)
-write.csv(wide_table_region_settlement_perc, file= "output/wide_table_perc_region_settlement.csv", row.names=FALSE)
+write.csv(wide_table(long_table_region_settlement), file= "output/wide_table_region_settlement.csv", row.names=FALSE)
+write.csv(wide_perc(wide_table(long_table_region_settlement)), file= "output/wide_table_perc_region_settlement.csv", row.names=FALSE)
 
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_region_settlement,
@@ -412,29 +350,18 @@ list_of_results_district %>% saveRDS("output/list_of_results_district.RDS")
 #get long table of results 
 long_table_district <- list_of_results_district$results %>% lapply(function(x) x[["summary.statistic"]]) %>% do.call(rbind, .)
 
-#re-format wide and as % for data merge in InDesign (FactSheets)
-table_district<-long_table_district[c("dependent.var","dependent.var.value" ,"repeat.var.value", "numbers")]
-table_district[table_district=="NA"]<-NA
-wide_table_district<-dcast(data = table_district, formula = repeat.var.value ~ dependent.var + dependent.var.value , fun.aggregate = NULL, value.var = "numbers")
-
-#make frequencies to percentages
-index_d<-which(grepl("_NA",names(wide_table_district)))
-index_d<-c(index_d, which(names(wide_table_district)=="repeat.var.value"))
-wide_table_district_perc<-wide_table_district
-wide_table_district_perc[-index_d] <-wide_table_district_perc[-index_d]*100  
-
 #export results as CSV files
-write.csv(wide_table_district, file= "output/wide_table_district.csv", row.names=FALSE)
 write.csv(long_table_district, file= "output/long_table_district.csv", row.names=FALSE)
-write.csv(wide_table_district_perc, file= "output/wide_table_perc_district.csv", row.names=FALSE)
+write.csv(wide_table(long_table_district), file= "output/wide_table_district.csv", row.names=FALSE)
+write.csv(wide_perc(wide_table(long_table_district)), file= "output/wide_table_perc_district.csv", row.names=FALSE)
 
-#CRASHED get html output
-#hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_district,
-#                                               render_result_with = hypegrammaR:::from_result_map_to_md_table,
-#                                               by_analysisplan_columns = c("dependent.var","repeat.var.value"),
-#                                               by_prefix =  c("",""),
-#                                               level = 2,
-#                                               questionnaire = questionnaire,
-#                                               label_varnames = TRUE,
-#                                               dir ="output",
-#                                               filename = "list_of_results_district.html")
+#get html output
+hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_district,
+                                               render_result_with = hypegrammaR:::from_result_map_to_md_table,
+                                               by_analysisplan_columns = c("dependent.var","repeat.var.value"),
+                                               by_prefix =  c("",""),
+                                               level = 2,
+                                               questionnaire = questionnaire,
+                                               label_varnames = TRUE,
+                                               dir ="output",
+                                               filename = "list_of_results_district.html")
