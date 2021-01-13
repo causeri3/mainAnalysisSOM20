@@ -56,8 +56,14 @@ wide_table<-function(x){
 #e.g. wide_perc(wide_table(long_results))
 
 wide_perc<-function(x){
-  index<-c(which(grepl("_NA",names(x))), which(names(x)=="repeat.var.value"), which(names(x)=="independent.var.value"))                                                     #get indexes for means and (area/settlement) level variables
-  wide_perc<-x                                                                                                                                                              #make new data frame
-  wide_perc[-index]<-wide_perc[-index]*100                                                                                                                                  #multiply only frquency-columns by 100 
+  index<-c(which(grepl("_NA",names(x))), which(names(x)=="repeat.var.value"), which(names(x)=="independent.var.value"))                                                     #get indices for means and (area/settlement) level variables
+  if (length(index)==0){                                                                                                                                                    #if no indexes:
+    wide_perc<-x*100                                                                                                                                                        #multiply whole data frame with 100
+  }
+    else{                                                                                                                                                                   #if index not 0:
+      wide_perc<-x                                                                                                                                                          #make new data frame
+      wide_perc[-index]<-wide_perc[-index]*100                                                                                                                              #multiply only frequency-columns by 100 
+    }
   return(wide_perc)
 }
+
