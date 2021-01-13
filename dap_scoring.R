@@ -78,8 +78,8 @@ agg_LSG<-function(x,y){
     sectoral_agg[j]<-max(sectoral_df[j,], na.rm=T)                                  #take max 
   }
   sectoral_agg[sectoral_agg==5]<-"4+" 
-  sectoral_agg[sectoral_agg==0]<-NA                                                 #recode 0 to NA
-  return(sectoral_agg)                                                              #recode 5 to 4+
+  sectoral_agg[sectoral_agg==0]<-NA                                                 #re-code 0 to NA
+  return(sectoral_agg)                                                              #re-code 5 to 4+
 }
 
 
@@ -88,7 +88,7 @@ agg_LSG<-function(x,y){
 #output: one score per household 1-4+, NA
 #_______________________________________________________________________________________________________________________________________________________________________________________
 agg_critical<-function(y){
-  y[y=="4+"]<-5                                                                     #recode 4+ to 5
+  y[y=="4+"]<-5                                                                     #re-code 4+ to 5
   for (i in 1:dim(y)[2]){
     if (length(which(y[i]==0))!=0){                                                 #loop over columns of critical indicators
       print(paste0("Warning:binary scored:",names(y[i])))                            
@@ -101,19 +101,19 @@ agg_critical<-function(y){
     critical_agg[j]<-max(y[j,], na.rm=T)                                            #take max 
   }
   critical_agg[critical_agg==5]<-"4+" 
-  critical_agg[critical_agg==0]<-NA                                                 #recode 0 to NA
-  return(critical_agg)                                                              #recode 5 to 4+
+  critical_agg[critical_agg==0]<-NA                                                 #re-code 0 to NA
+  return(critical_agg)                                                              #re-code 5 to 4+
 }
 
-#recode 1-4+ to 1/0 indicators
+#re-code 1-4+ to 1/0 indicators
 #input: data frame with variables coded in 1-4+, NA
 #output: data frame with variables coded 1/0, NA
-#___________________________________________________________________________________________________________________________________________
+#______________________________________________________________________________________________________________________________________________________________________________________
 re_code<-function(x){
   for (i in 1:dim(x)[2]){                                                            #loop over all columns
     if (length(which(x[i]==0))==0){                                                  #if not binary coded:
-      x[i][(x[i]==1 | x[i]==2) & (!is.na(x[i]))]<-0                                  #recode 1&2 (if not NA) to 0
-      x[i][(x[i]==3 | x[i]==3 | x[i]==4 | x[i]=="4+" )& (!is.na(x[i]))]<-1           #recode 3 &4 & 4+ (if not NA) to 1
+      x[i][(x[i]==1 | x[i]==2) & (!is.na(x[i]))]<-0                                  #re-code 1&2 (if not NA) to 0
+      x[i][(x[i]==3 | x[i]==4 | x[i]=="4+") & (!is.na(x[i]))]<-1                     #re-code 3 &4 & 4+ (if not NA) to 1
     } 
     x[i]<-as.numeric(as.character(unlist(x[i])))                                     #make all columns numeric
     #print(names(x[i]))                                                               #for debugging
