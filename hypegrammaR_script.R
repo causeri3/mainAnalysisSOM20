@@ -59,35 +59,6 @@ jmcna[select_multiple]<-lapply(jmcna[select_multiple],as.character)
 #adapt naming to hypegrammaR-style
 dap_state_settlement$dependent.variable<-hypegrammaR:::to_alphanumeric_lowercase(dap_state_settlement$dependent.variable)
 
-##############SKIP FUNCTIONS FOR DIRECT REPORTING#############################################################################################################################################################
-
-#################
-### FUNCTIONS ###
-#################
-
-# Getting and export table with p-value
-
-table_wrangling <- function(x) {
-  stats <- x[["summary.statistic"]]
-  pval_table <- as.data.frame(x[["hypothesis.test"]])
-  num_col = ncol(pval_table)
-  if (num_col != 5) {
-    if (num_col == 0) {
-      pval_table <- data.frame(F = NA, p.value = NA, ndf = NA, ddf = NA, name = NA)
-    } else {
-      pval_table <- full_join(data.frame(F = numeric(), p.value = numeric(), ndf = numeric(), ddf = numeric(), name = character()), pval_table)
-    }
-  } else {
-    names(pval_table) <- c("F", "p.value", "ndf", "ddf", "name")
-  }
-  cbind(stats, pval_table)
-}
-
-pval_table <- function(results, filename) {
-  lapply(results, table_wrangling) %>%
-    do.call(rbind, .) %>%
-    write.csv(filename, row.names = F)
-}
 
 ##########GET RESULTS AND SAVE IN DIFFERENT FORMATS###########################################################################################################################################################
 
@@ -133,9 +104,6 @@ write.csv(wide_table_national, file= "output/wide_table_national.csv", row.names
 write.csv(long_table_national, file= "output/long_table_national.csv", row.names=FALSE)
 write.csv(wide_table_national_perc, file= "output/wide_table_perc_national.csv", row.names=FALSE)
 
-#get table with p-values and F-statistic (if not only direct reporting)
-#pval_table(list_of_results_national$results, "output/list_of_results_hypo_national.csv")
-
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_national,
                                                render_result_with = hypegrammaR:::from_result_map_to_md_table,
@@ -164,7 +132,6 @@ list_of_results_national_settlement <-  from_analysisplan_map_to_output(jmcna,
                                                                         questionnaire = questionnaire, confidence_level = 0.90)
 end_time <- Sys.time()                                                                                                                      #timer
 end_time - start_time                                                                                                                       #timer
-#
 
 #save results as R file and get it 
 list_of_results_national_settlement %>% saveRDS("output/list_of_results_national_settlement.RDS")
@@ -189,9 +156,6 @@ wide_table_national_settlement_perc[-index_n_s] <-wide_table_national_settlement
 write.csv(wide_table_national_settlement, file= "output/wide_table_national_settlement.csv", row.names=FALSE)
 write.csv(long_table_national_settlement, file= "output/long_table_national_settlement.csv", row.names=FALSE)
 write.csv(wide_table_national_settlement_perc, file= "output/wide_table_perc_national_settlement.csv", row.names=FALSE)
-
-#get table with p-values and F-statistic (if not only direct reporting)
-#pval_table(list_of_results_national_settlement$results, "output/list_of_results_hypo_national_settlement.csv")
 
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_national_settlement,
@@ -248,9 +212,6 @@ write.csv(wide_table_state, file= "output/wide_table_state.csv", row.names=FALSE
 write.csv(long_table_state, file= "output/long_table_state.csv", row.names=FALSE)
 write.csv(wide_table_state_perc, file= "output/wide_table_perc_state.csv", row.names=FALSE)
 
-#get table with p-values and F-statistic (if not only direct reporting)
-#pval_table(list_of_results_state$results, "output/list_of_results_hypo_state.csv")
-
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_state,
                                                render_result_with = hypegrammaR:::from_result_map_to_md_table,
@@ -277,7 +238,7 @@ list_of_results_state_settlement <-  from_analysisplan_map_to_output(jmcna,
                                                                      questionnaire = questionnaire, confidence_level = 0.90)
 end_time <- Sys.time()                                                                                                                      #timer
 end_time - start_time                                                                                                                       #timer
-#
+#5h
 
 #save results as R file and get it 
 list_of_results_state_settlement %>% saveRDS("output/list_of_results_state_settlement.RDS")
@@ -301,9 +262,6 @@ wide_table_state_settlement_perc[-index_s_s] <-wide_table_state_settlement_perc[
 write.csv(wide_table_state_settlement, file= "output/wide_table_state_settlement.csv", row.names=FALSE)
 write.csv(long_table_state_settlement, file= "output/long_table_state_settlement.csv", row.names=FALSE)
 write.csv(wide_table_state_settlement_perc, file= "output/wide_table_perc_state_settlement.csv", row.names=FALSE)
-
-#get table with p-values and F-statistic (if not only direct reporting)
-#pval_table(list_of_results_state_settlement$results, "output/list_of_results_hypo_state_settlement.csv")
 
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_state_settlement,
@@ -361,10 +319,6 @@ write.csv(wide_table_region, file= "output/wide_table_region.csv", row.names=FAL
 write.csv(long_table_region, file= "output/long_table_region.csv", row.names=FALSE)
 write.csv(wide_table_region_perc, file= "output/wide_table_perc_region.csv", row.names=FALSE)
 
-
-#get table with p-values and F-statistic (if not only direct reporting)
-#pval_table(list_of_results_region$results, "output/list_of_results_hypo_region.csv")
-
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_region,
                                                render_result_with = hypegrammaR:::from_result_map_to_md_table,
@@ -394,6 +348,7 @@ list_of_results_region_settlement <-  from_analysisplan_map_to_output(jmcna,
                                                                       questionnaire = questionnaire, confidence_level = 0.90)
 end_time <- Sys.time()                                                                                                                      #timer
 end_time - start_time                                                                                                                       #timer
+#8.5h
 
 #save results as R file and get it 
 list_of_results_region_settlement %>% saveRDS("output/list_of_results_region_settlement.RDS")
@@ -417,9 +372,6 @@ wide_table_region_settlement_perc[-index_r_s] <-wide_table_region_settlement_per
 write.csv(wide_table_region_settlement, file= "output/wide_table_region_settlement.csv", row.names=FALSE)
 write.csv(long_table_region_settlement, file= "output/long_table_region_settlement.csv", row.names=FALSE)
 write.csv(wide_table_region_settlement_perc, file= "output/wide_table_perc_region_settlement.csv", row.names=FALSE)
-
-#get table with p-values and F-statistic (if not only direct reporting)
-#pval_table(list_of_results_region_settlement$results, "output/list_of_results_hypo_region_settlement.csv")
 
 #get html output
 hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_region_settlement,
@@ -451,6 +403,7 @@ list_of_results_district <-  from_analysisplan_map_to_output(jmcna,
                                                              questionnaire = questionnaire, confidence_level = 0.90)
 end_time <- Sys.time()                                                                                                                      #timer
 end_time - start_time                                                                                                                       #timer
+#20.98h
 
 #save results as R file and get it 
 list_of_results_district %>% saveRDS("output/list_of_results_district.RDS")
@@ -475,16 +428,13 @@ write.csv(wide_table_district, file= "output/wide_table_district.csv", row.names
 write.csv(long_table_district, file= "output/long_table_district.csv", row.names=FALSE)
 write.csv(wide_table_district_perc, file= "output/wide_table_perc_district.csv", row.names=FALSE)
 
-#get table with p-values and F-statistic (if not only direct reporting)
-#pval_table(list_of_results_district$results, "output/list_of_results_hypo_district.csv")
-
-#get html output
-hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_district,
-                                               render_result_with = hypegrammaR:::from_result_map_to_md_table,
-                                               by_analysisplan_columns = c("dependent.var","repeat.var.value"),
-                                               by_prefix =  c("",""),
-                                               level = 2,
-                                               questionnaire = questionnaire,
-                                               label_varnames = TRUE,
-                                               dir ="output",
-                                               filename = "list_of_results_district.html")
+#CRASHED get html output
+#hypegrammaR:::map_to_generic_hierarchical_html(list_of_results_district,
+#                                               render_result_with = hypegrammaR:::from_result_map_to_md_table,
+#                                               by_analysisplan_columns = c("dependent.var","repeat.var.value"),
+#                                               by_prefix =  c("",""),
+#                                               level = 2,
+#                                               questionnaire = questionnaire,
+#                                               label_varnames = TRUE,
+#                                               dir ="output",
+#                                               filename = "list_of_results_district.html")
