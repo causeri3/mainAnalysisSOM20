@@ -37,40 +37,27 @@ LSG<-c("LSG_education", "LSG_health", "LSG_nutrition", "LSG_FSC", "LSG_WASH", "L
 jmcna[LSG][jmcna[LSG]=="4+"]<-5
 jmcna[LSG]<-lapply(jmcna[LSG],as.numeric)
 
-#plot_set_percentages is the generic function, the index_intesections is a wrapper around it and it calculates around the lsg specfically
-#plot_set_percentages(jmcna,#hno,
-#                     LSG,#varnames = c("Sev..score.IPC", "Sev...score.GAM", "Sev.score..Access.to.an.improved.water.source", "Sev.score..Access.to.a.sufficient.quantity.of.water", "Sev.score..Access.to.adequate..appropriate.and.functional.sanitation.facilities", "Sev..score.HFCs"),
-#                     mutually_exclusive_sets = F,
-#                     exclude_unique = T,
-#                     round_to_1_percent = F,
-#                     nintersects = 10,
-#                     weighting_function = weighting_function#,
-                    #weight_variable = "weights_tableau"
-#                     )
-
-
-inter<- index_intersections(
-                            jmcna, #hno,
+#decided on threshold of 3% which means 10 intersections plotted
+inter<- index_intersections(jmcna, 
                             lsg = LSG, 
-                              #c("Sev..score.IPC", "Sev...score.GAM", "Sev.score..Access.to.an.improved.water.source", "Sev.score..Access.to.a.sufficient.quantity.of.water", "Sev.score..Access.to.adequate..appropriate.and.functional.sanitation.facilities", "Sev..score.HFCs"),
                             lsg_labels = c("Education", "Health", "Nutrition","FSC", "WASH",  "SNFI", "Protection"),
                             y_label = "% in need per combination of sectors",
                             index_filter = c(3, 4, 5),
                             weighting_function = weighting_function,
-                            #nintersects = 12,
+                            nintersects = 10,
                             exclude_unique = T,
                             mutually_exclusive_sets = T,
                             round_to_1_percent = T,
                             print_plot = F,
                             plot_name = "intersection"
                             )
-pdf("output/graphs/LSG_intersection.pdf", width = 5, height = 4)
+pdf("output/graphs/LSG_intersection.pdf", width = ((11.4*1.5)/cm(1)), height = ((9.3*1.5)/cm(1))) #InDesign: H: 9.3 cm X W: 8.5 cm, since ~ 1/3 chopping off: W:11.4
 inter
 dev.off()
 
 
-radar<- msni19::radar_graph(jmcna, #hno,
-                            lsg = LSG, #c("Sev..score.IPC", "Sev...score.GAM", "Sev.score..Access.to.an.improved.water.source", "Sev.score..Access.to.a.sufficient.quantity.of.water", "Sev.score..Access.to.adequate..appropriate.and.functional.sanitation.facilities", "Sev..score.HFCs"),
+radar<- msni19::radar_graph(jmcna, 
+                            lsg = LSG,
                             lsg_labels = c("Education", "Health", "Nutrition","FSC", "WASH",  "SNFI", "Protection"),
                             group = "settlement_type",
                             group_order = c("IDP","HC"),
@@ -81,26 +68,15 @@ radar<- msni19::radar_graph(jmcna, #hno,
                             plot_name = "LSG_radar"
                             )
 
-pdf("output/graphs/LSG_radar.pdf", width = 6, height = 4)
+pdf("output/graphs/LSG_radar.pdf", width = ((9.3*2)/cm(1)), height = ((6.6*2)/cm(1))) #InDesign: H: 6.6cm X W: 9.3 
 radar
 dev.off()
-
-
-
-#don't have a coping gap index (capacity gap) so far
-#msni19::venn_msni(jmcna, #hno,
-#                  lsg = LSG, #c("Sev..score.IPC", "Sev...score.GAM", "Sev.score..Access.to.an.improved.water.source", "Sev.score..Access.to.a.sufficient.quantity.of.water", "Sev.score..Access.to.adequate..appropriate.and.functional.sanitation.facilities", "Sev..score.HFCs"),
-#                  capacity_gaps = "K9_CG", #Sev..score.IPC",
-#                  weighting_function = weighting_function,
-#                  print_plot = T,
-#                  plot_name = "LSG_CG_K9_venn",
-#                  path = "output/graphs")
-
 
 ##########################
 #####JUST FOR 4 an 4+#####
 ##########################
 
+#decided on threshold of 3% which means 6 intersections plotted
 inter2<- index_intersections(
   jmcna,
   lsg = LSG, 
@@ -108,14 +84,14 @@ inter2<- index_intersections(
   y_label = "% in need per combination of sectors",
   index_filter = c(4, 5),
   weighting_function = weighting_function,
-  #nintersects = 12,
+  nintersects = 6,
   exclude_unique = T,
   mutually_exclusive_sets = T,
   round_to_1_percent = T,
   print_plot = F,
   plot_name = "intersection"
 )
-pdf("output/graphs/LSG_intersection_4s.pdf", width = 5, height = 4)
+pdf("output/graphs/LSG_intersection_4s.pdf", ((11.4*1.5)/cm(1)), height = ((9.3*1.5)/cm(1))) #InDesign: H: 9.3 cm X W: 8.5 cm, since ~ 1/3 chopping off: W:11.4
 inter2
 dev.off()
 
@@ -134,6 +110,30 @@ radar2<- msni19::radar_graph(jmcna,
                             plot_name = "LSG_radar"
 )
 
-pdf("output/graphs/LSG_radar_4s.pdf", width = 6, height = 4)
+pdf("output/graphs/LSG_radar_4s.pdf", width = ((9.3*2)/cm(1)), height = ((6.6*2)/cm(1))) #InDesign: H: 6.6cm X W:9.3 
 radar2
 dev.off()
+
+###graph not very informative: no good cross-cutting CG and 99% scoring LSG 3 and above#####################################################################################################################################################################
+
+#don't have a good cross-cutting coping gap index (capacity gap)
+msni19::venn_msni(jmcna, 
+                  lsg = LSG, 
+                  capacity_gaps = "K9", #"Sev..score.IPC",
+                  weighting_function = weighting_function,
+                  print_plot = F,
+                  plot_name = "LSG_CG_K9_venn",
+                  path = "output/graphs")
+
+#"plot_set_percentages is the generic function, the index_intesections is a wrapper around it and it calculates around the lsg specfically"
+#plot_set_percentages(jmcna,#hno,
+#                     LSG,#varnames = c("Sev..score.IPC", "Sev...score.GAM", "Sev.score..Access.to.an.improved.water.source", "Sev.score..Access.to.a.sufficient.quantity.of.water", "Sev.score..Access.to.adequate..appropriate.and.functional.sanitation.facilities", "Sev..score.HFCs"),
+#                     mutually_exclusive_sets = F,
+#                     exclude_unique = T,
+#                     round_to_1_percent = F,
+#                     nintersects = 10,
+#                     weighting_function = weighting_function#,
+                      #weight_variable = "weights_tableau"
+#                     )
+
+
