@@ -105,5 +105,5 @@ wide_table_perc[3:length(wide_table_perc)]<-wide_table_perc[3:length(wide_table_
 
 #####EXPORT#####
 
-write.csv(wide_table,"output/frequency_table_indicators_districts_settlement.csv", row.names=FALSE)
-write.csv(wide_table_perc,"output/percent_table_indicators_districts_settlement.csv", row.names=FALSE)
+write.csv(wide_table,"output/frequency_indicators_districts_settlement.csv", row.names=FALSE)
+write.csv(wide_table_perc,"output/percent_indicators_districts_settlement.csv", row.names=FALSE)
