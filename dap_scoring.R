@@ -109,7 +109,7 @@ agg_critical<-function(y){
 #input: data frame with variables coded in 1-4+, NA
 #output: data frame with variables coded 1/0, NA
 #______________________________________________________________________________________________________________________________________________________________________________________
-re_code<-function(x){
+re_code_CG<-function(x){
   for (i in 1:dim(x)[2]){                                                            #loop over all columns
     if (length(which(x[i]==0))==0){                                                  #if not binary coded:
       x[i][(x[i]==1 | x[i]==2) & (!is.na(x[i]))]<-0                                  #re-code 1&2 (if not NA) to 0
@@ -123,6 +123,41 @@ re_code<-function(x){
   return(as.data.frame(x))
 }
 
+#re-code 1-4+ to 1/0 indicators
+#input: data frame with variables coded in 1-4+, NA
+#output: data frame with variables coded 1/0, NA
+#______________________________________________________________________________________________________________________________________________________________________________________
+re_code_dummy<-function(x){
+  for (i in 1:dim(x)[2]){                                                            #loop over all columns
+    if (length(which(x[i]==0))==0){                                                  #if not binary coded:
+      x[i][(x[i]==1 | x[i]==2) & (!is.na(x[i]))]<-0                                  #re-code 1&2 (if not NA) to 0
+      x[i][(x[i]==3 | x[i]==4 | x[i]=="4+") & (!is.na(x[i]))]<-1                     #re-code 3 &4 & 4+ (if not NA) to 1
+    } 
+    x[i]<-as.numeric(as.character(unlist(x[i])))                                     #make all columns numeric
+    #print(names(x[i]))                                                               #for debugging
+    #print(table(x[i]))                                                               #for debugging
+    names(x)[i]<-paste0(names(x)[i], "_dummy")
+  }
+  return(as.data.frame(x))
+}
+
+#re-code 1-4+ to 1/0 indicators
+#input: data frame with variables coded in 1-4+, NA
+#output: data frame with variables coded 1/0, NA
+#______________________________________________________________________________________________________________________________________________________________________________________
+re_code_dummy_4s<-function(x){
+  for (i in 1:dim(x)[2]){                                                             #loop over all columns
+    if (length(which(x[i]==0))==0){                                                   #if not binary coded:
+      x[i][(x[i]==1 | x[i]==2 | x[i]==3) & (!is.na(x[i]))]<-0                         #re-code 1&2&3 (if not NA) to 0
+      x[i][(x[i]==4 | x[i]=="4+") & (!is.na(x[i]))]<-1                                #re-code 4 & 4+ (if not NA) to 1
+    } 
+    x[i]<-as.numeric(as.character(unlist(x[i])))                                      #make all columns numeric
+    #print(names(x[i]))                                                               #for debugging
+    #print(table(x[i]))                                                               #for debugging
+    names(x)[i]<-paste0(names(x)[i], "_dummy_4s")
+  }
+  return(as.data.frame(x))
+}
 
 ####################################################################################################################################################################################################################################################################################################
 ######NEW VARIABLES TO HELP CALCULATE SCORES########################################################################################################################################################################################################################################################
@@ -784,17 +819,110 @@ df$N7[df$aid_barriers.insecure_route==1 |df$aid_barriers.insecure_site==1 | df$a
 
 
 ####################################################################################################################################################################################################################################################################################################
-######COPING GAPS & MULTI-SECTOR NEEDS INDEX [CG'S & MSNI]##########################################################################################################################################################################################################################################
+######COPING GAPS & MULTI-SECTOR NEEDS INDEX [CG'S & MSNI] #########################################################################################################################################################################################################################################
 ####################################################################################################################################################################################################################################################################################################
 
+#Coping Gaps dummies (binary scored)
 CG<-c("G2", "G4", "J3", "K9", "K11", "K12", "M1", "M2")
 df_CG<-df[CG]
-df_CG_recoded<-re_code(df_CG)
+df_CG_recoded<-re_code_CG(df_CG)
 df<-cbind(df, df_CG_recoded)
 
+#MSNI
 LSG<-c("LSG_education", "LSG_health", "LSG_nutrition", "LSG_FSC", "LSG_WASH", "LSG_SNFI", "LSG_protection" )
 df_MSNI<-df[LSG]
 df$MSNI<-agg_critical(df_MSNI)
+
+
+####################################################################################################################################################################################################################################################################################################
+######CHECKS FOR ANALYSIS (14.01.21 onward): households scoring LSG's AND CG's #####################################################################################################################################################################################################################
+####################################################################################################################################################################################################################################################################################################
+
+#LSG dummies (binary scored): check for households having at least one LSG scored "in need" (3-4+)
+LSG_dum<-re_code_dummy(df[LSG])
+LSG_dummy<-LSG_dum
+LSG_dummy[is.na(LSG_dummy)]<-0
+LSG_dum$LSGs_dummy<-1
+LSG_dum$LSGs_dummy[which(LSG_dummy[1]==0 & LSG_dummy[2]==0 &LSG_dummy[3]==0 &LSG_dummy[4]==0 & LSG_dummy[5]==0 & LSG_dummy[6]==0 &LSG_dummy[7]==0)]<-0
+#15 households: ~ 0.15% 
+
+#count amount of LSG's scored 3,4,or 4+ for eac household
+LSG_dum$LSGs_count<-(LSG_dummy[1] + LSG_dummy[2] + LSG_dummy[3] + LSG_dummy[4] + LSG_dummy[5] + LSG_dummy[6] + LSG_dummy[7])
+
+#LSG and CG dummies, how many of the households scoring under 3 in LSG, score over 3 (or 1 as binary scoring approach) in CG
+df_CG_recoded_0<-df_CG_recoded
+df_CG_recoded_0[is.na(df_CG_recoded_0)]<-0
+which(LSG_dum$LSGs_dum==0 & df_CG_recoded_0[1]==0 & df_CG_recoded_0[2]==0 & df_CG_recoded_0[3]==0 & df_CG_recoded_0[4]==0 & df_CG_recoded_0[5]==0 & df_CG_recoded_0[6]==0 & df_CG_recoded_0[7]==0& df_CG_recoded_0[8]==0 )
+#8 out of 15 households have no LSG and CG "in need"(3,4,4+) ; 7 of 15 households not scoring any LSG "in need", do score a CG "in need"
+
+#LSG dummies (binary scored): check for households having at least one LSG scored 4 or 4+
+LSG_dum_4s<-re_code_dummy_4s(df[LSG])
+LSG_dummy_4s<-LSG_dum_4s
+LSG_dummy_4s[is.na(LSG_dummy_4s)]<-0
+LSG_dum_4s$LSGs_dummy_4s<-1
+LSG_dum_4s$LSGs_dummy_4s[which(LSG_dummy_4s[1]==0 & LSG_dummy_4s[2]==0 &LSG_dummy_4s[3]==0 &LSG_dummy_4s[4]==0 & LSG_dummy_4s[5]==0 & LSG_dummy_4s[6]==0 &LSG_dummy_4s[7]==0)]<-0
+#1083 households: ~ 10.5%
+
+#LSG and CG dummies, how many of the households scoring under 4 in LSG, score over 3 (or 1 as binary scoring approach) in CG
+df_CG_recoded_0<-df_CG_recoded
+df_CG_recoded_0[is.na(df_CG_recoded_0)]<-0
+length(which(LSG_dum_4s$LSGs_dummy_4s==0 & df_CG_recoded_0[1]==0 & df_CG_recoded_0[2]==0 & df_CG_recoded_0[3]==0 & df_CG_recoded_0[4]==0 & df_CG_recoded_0[5]==0 & df_CG_recoded_0[6]==0 & df_CG_recoded_0[7]==0& df_CG_recoded_0[8]==0 ))
+#144 -> ~ 87% of ~ 10.5% having LSG's in 1-3, have a CG "in need" (3-4+ or 1 as binary scoring approach)
+
+#create variables for LSG-CG-relationship
+LSG_dum$LSGs_CGs<-LSG_dum$LSGs_dummy
+LSG_dum$LSGs_CGs[LSG_dum$LSGs_CGs==1]<-"LSG"
+LSG_dum$LSGs_CGs[which(LSG_dum$LSGs_dummy==0 & df_CG_recoded_0[1]==0 & df_CG_recoded_0[2]==0 & df_CG_recoded_0[3]==0 & df_CG_recoded_0[4]==0 & df_CG_recoded_0[5]==0 & df_CG_recoded_0[6]==0 & df_CG_recoded_0[7]==0& df_CG_recoded_0[8]==0)] <-"neither"
+LSG_dum$LSGs_CGs[LSG_dum$LSGs_CGs==0]<-"LSG_under3_and_CG"
+
+LSG_dum$LSG_education_CG<-LSG_dum$LSG_education_dummy
+LSG_dum$LSG_education_CG[LSG_dum$LSG_education_CG==1]<-"LSG"
+LSG_dum$LSG_education_CG[which(LSG_dum$LSG_education_dummy==0 & df_CG_recoded_0[1]==0 & df_CG_recoded_0[2]==0)] <-"neither"
+LSG_dum$LSG_education_CG[LSG_dum$LSG_education_CG==0]<-"LSG_under3_and_CG"
+
+LSG_dum$LSG_FSC_CG<-LSG_dum$LSG_FSC_dummy
+LSG_dum$LSG_FSC_CG[LSG_dum$LSG_FSC_CG==1]<-"LSG"
+LSG_dum$LSG_FSC_CG[which(LSG_dum$LSG_FSC_dummy==0 & df_CG_recoded_0[3]==0)] <-"neither"
+LSG_dum$LSG_FSC_CG[LSG_dum$LSG_FSC_CG==0]<-"LSG_under3_and_CG"
+
+LSG_dum$LSG_WASH_CG<-LSG_dum$LSG_WASH_dummy
+LSG_dum$LSG_WASH_CG[LSG_dum$LSG_WASH_CG==1]<-"LSG"
+LSG_dum$LSG_WASH_CG[which(LSG_dum$LSG_WASH_dummy==0 & df_CG_recoded_0[4]==0 & df_CG_recoded_0[5]==0 & df_CG_recoded_0[6]==0)] <-"neither"
+LSG_dum$LSG_WASH_CG[LSG_dum$LSG_WASH_CG==0]<-"LSG_under3_and_CG"
+
+LSG_dum$LSG_protection_CG<-LSG_dum$LSG_protection_dummy
+LSG_dum$LSG_protection_CG[LSG_dum$LSG_protection_CG==1]<-"LSG"
+LSG_dum$LSG_protection_CG[which(LSG_dum$LSG_protection_dummy==0 & df_CG_recoded_0[7]==0 & df_CG_recoded_0[8]==0)] <-"neither"
+LSG_dum$LSG_protection_CG[LSG_dum$LSG_protection_CG==0]<-"LSG_under3_and_CG"
+
+
+LSG_dum_4s$LSGs_4_CGs<-LSG_dum_4s$LSGs_dummy_4s
+LSG_dum_4s$LSGs_4_CGs[LSG_dum_4s$LSGs_4_CGs==1]<-"LSG_4s"
+LSG_dum_4s$LSGs_4_CGs[which(LSG_dum_4s$LSGs_dummy_4s==0 & df_CG_recoded_0[1]==0 & df_CG_recoded_0[2]==0 & df_CG_recoded_0[3]==0 & df_CG_recoded_0[4]==0 & df_CG_recoded_0[5]==0 & df_CG_recoded_0[6]==0 & df_CG_recoded_0[7]==0& df_CG_recoded_0[8]==0)] <-"neither"
+LSG_dum_4s$LSGs_4_CGs[LSG_dum_4s$LSGs_4_CGs==0]<-"LSG_under4_and_CG"
+
+LSG_dum_4s$LSG_4_education_CG<-LSG_dum_4s$LSG_education_dummy
+LSG_dum_4s$LSG_4_education_CG[LSG_dum_4s$LSG_4_education_CG==1]<-"LSG_4s"
+LSG_dum_4s$LSG_4_education_CG[which(LSG_dum_4s$LSG_education_dummy==0 & df_CG_recoded_0[1]==0 & df_CG_recoded_0[2]==0)] <-"neither"
+LSG_dum_4s$LSG_4_education_CG[LSG_dum_4s$LSG_4_education_CG==0]<-"LSG_under4_and_CG"
+
+LSG_dum_4s$LSG_4_FSC_CG<-LSG_dum_4s$LSG_FSC_dummy
+LSG_dum_4s$LSG_4_FSC_CG[LSG_dum_4s$LSG_4_FSC_CG==1]<-"LSG_4s"
+LSG_dum_4s$LSG_4_FSC_CG[which(LSG_dum_4s$LSG_FSC_dummy==0 & df_CG_recoded_0[3]==0)] <-"neither"
+LSG_dum_4s$LSG_4_FSC_CG[LSG_dum_4s$LSG_4_FSC_CG==0]<-"LSG_under4_and_CG"
+
+LSG_dum_4s$LSG_4_WASH_CG<-LSG_dum_4s$LSG_WASH_dummy
+LSG_dum_4s$LSG_4_WASH_CG[LSG_dum_4s$LSG_4_WASH_CG==1]<-"LSG_4s"
+LSG_dum_4s$LSG_4_WASH_CG[which(LSG_dum_4s$LSG_WASH_dummy==0 & df_CG_recoded_0[4]==0 & df_CG_recoded_0[5]==0 & df_CG_recoded_0[6]==0)] <-"neither"
+LSG_dum_4s$LSG_4_WASH_CG[LSG_dum_4s$LSG_4_WASH_CG==0]<-"LSG_under4_and_CG"
+
+LSG_dum_4s$LSG_4_protection_CG<-LSG_dum_4s$LSG_protection_dummy
+LSG_dum_4s$LSG_4_protection_CG[LSG_dum_4s$LSG_4_protection_CG==1]<-"LSG_4s"
+LSG_dum_4s$LSG_4_protection_CG[which(LSG_dum_4s$LSG_protection_dummy==0 & df_CG_recoded_0[7]==0 & df_CG_recoded_0[8]==0)] <-"neither"
+LSG_dum_4s$LSG_4_protection_CG[LSG_dum_4s$LSG_4_protection_CG==0]<-"LSG_under4_and_CG"
+
+#take over what is wanted for the report
+df<-cbind(df, LSG_dum, LSG_dum_4s)
 
 
 ####################################################################################################################################################################################################################################################################################################
@@ -805,5 +933,3 @@ today <- Sys.Date()
 today<-format(today, format="_%Y_%b_%d")
 
 write.csv(df, paste0("output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored",today,".csv"), row.names=FALSE)
-#write.csv(df_MSNI, paste0("output/MSNI_LSG",today,".csv"), row.names=FALSE)
-
