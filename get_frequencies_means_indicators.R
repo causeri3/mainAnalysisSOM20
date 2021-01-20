@@ -1,4 +1,4 @@
-#GET FREQUENCIES / MEANS OF SURVEY ANSWERS AGGREGATED FOR SETTLEMENT TYPE (IDP/HC) AND AREA LEVEL AS WIDE FORMAT [UNWEIGHTED, ONLY FOR SAME AEREA LEVEL AS STRATA, IF NON-PROBABILISTIC SAMPLING]
+#GET FREQUENCIES /PERCENTAGES OF INDICATORS AGGREGATED FOR SETTLEMENT TYPE (IDP/HC) AND AREA LEVEL AS WIDE FORMAT [UNWEIGHTED, ONLY FOR SAME AEREA LEVEL AS STRATA, IF NON-PROBABILISTIC SAMPLING]
 library(reshape2)
 
 
@@ -6,7 +6,7 @@ library(reshape2)
 setwd("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/GitHub/mainAnalysisSOM20")
 
 #import data set
-df_original <- read.csv(file="output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored_2021_Jan_07.csv", head=T, dec=".", sep=",", na.strings=c(""," ","NA"))
+df_original <- read.csv(file="output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored_2021_Jan_19.csv", head=T, dec=".", sep=",", na.strings=c(""," ","NA"))
 
 #############################################################################################################################################################################################
 #########MAKE ADAPTIONS SPECIFIC TO YOUR DATA SET############################################################################################################################################
@@ -64,7 +64,7 @@ for (i in start:length(df)){                                                    
 
 end_time <- Sys.time()                                                                                                 #timer
 end_time - start_time                                                                                                  #timer
-
+#4.8min
 
 #####NON-IDP-TABLE#####
 
@@ -89,7 +89,7 @@ for (i in start:length(df)){                                                    
 
 end_time <- Sys.time()                                                                                                  #timer
 end_time - start_time                                                                                                   #timer
-
+#6.6min
 
 #####JOIN TABLES AND FORMAT WIDE#####
 long_table<-rbind(long_table_idp,long_table_non_idp)                                                                    #join tables row-wise
