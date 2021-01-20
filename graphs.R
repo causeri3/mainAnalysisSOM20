@@ -27,7 +27,8 @@ weighting_function <- surveyweights::weighting_fun_from_samplingframe(sampling.f
                                                                       data = jmcna,
                                                                       sampling.frame.population.column ="Population",
                                                                       sampling.frame.stratum.column = "stratum_id",
-                                                                      data.stratum.column = "stratum_id")
+                                                                      data.stratum.column = "stratum_id"
+                                                                      )
 
 
 
@@ -51,6 +52,7 @@ inter<- index_intersections(jmcna,
                             print_plot = F,
                             plot_name = "intersection"
                             )
+
 pdf("output/graphs/LSG_intersection.pdf", width = ((11.4*1.5)/cm(1)), height = ((9.3*1.5)/cm(1))) #InDesign: H: 9.3 cm X W: 8.5 cm, since ~ 1/3 chopping off: W:11.4
 inter
 dev.off()
@@ -77,20 +79,20 @@ dev.off()
 ##########################
 
 #decided on threshold of 3% which means 6 intersections plotted
-inter2<- index_intersections(
-  jmcna,
-  lsg = LSG, 
-  lsg_labels = c("Education", "Health", "Nutrition","FSC", "WASH",  "SNFI", "Protection"),
-  y_label = "% in need per combination of sectors",
-  index_filter = c(4, 5),
-  weighting_function = weighting_function,
-  nintersects = 6,
-  exclude_unique = T,
-  mutually_exclusive_sets = T,
-  round_to_1_percent = T,
-  print_plot = F,
-  plot_name = "intersection"
-)
+inter2<- index_intersections(jmcna,
+                             lsg = LSG, 
+                             lsg_labels = c("Education", "Health", "Nutrition","FSC", "WASH",  "SNFI", "Protection"),
+                             y_label = "% in need per combination of sectors",
+                             index_filter = c(4, 5),
+                             weighting_function = weighting_function,
+                             nintersects = 6,
+                             exclude_unique = T,
+                             mutually_exclusive_sets = T,
+                             round_to_1_percent = T,
+                             print_plot = F,
+                             plot_name = "intersection"
+                             )
+
 pdf("output/graphs/LSG_intersection_4s.pdf", ((11.4*1.5)/cm(1)), height = ((9.3*1.5)/cm(1))) #InDesign: H: 9.3 cm X W: 8.5 cm, since ~ 1/3 chopping off: W:11.4
 inter2
 dev.off()
@@ -99,16 +101,16 @@ dev.off()
 jmcna[LSG][jmcna[LSG]==3]<-2
 
 radar2<- msni19::radar_graph(jmcna,
-                            lsg = LSG, 
-                            lsg_labels = c("Education", "Health", "Nutrition","FSC", "WASH",  "SNFI", "Protection"),
-                            group = "settlement_type",
-                            group_order = c("IDP","HC"),
-                            group_labels =  c("IDP","HC"),
-                            weighting_function = weighting_function,
-                            legend_position = "left",
-                            print_plot = F,
-                            plot_name = "LSG_radar"
-)
+                             lsg = LSG, 
+                             lsg_labels = c("Education", "Health", "Nutrition","FSC", "WASH",  "SNFI", "Protection"),
+                             group = "settlement_type",
+                             group_order = c("IDP","HC"),
+                             group_labels =  c("IDP","HC"),
+                             weighting_function = weighting_function,
+                             legend_position = "left",
+                             print_plot = F,
+                             plot_name = "LSG_radar"
+                             )
 
 pdf("output/graphs/LSG_radar_4s.pdf", width = ((9.3*2)/cm(1)), height = ((6.6*2)/cm(1))) #InDesign: H: 6.6cm X W:9.3 
 radar2
@@ -119,7 +121,7 @@ dev.off()
 #don't have a good cross-cutting coping gap index (capacity gap)
 msni19::venn_msni(jmcna, 
                   lsg = LSG, 
-                  capacity_gaps = "K9", #"Sev..score.IPC",
+                  capacity_gaps = "K9",
                   weighting_function = weighting_function,
                   print_plot = F,
                   plot_name = "LSG_CG_K9_venn",
@@ -133,7 +135,5 @@ msni19::venn_msni(jmcna,
 #                     round_to_1_percent = F,
 #                     nintersects = 10,
 #                     weighting_function = weighting_function#,
-                      #weight_variable = "weights_tableau"
+#weight_variable = "weights_tableau"
 #                     )
-
-
