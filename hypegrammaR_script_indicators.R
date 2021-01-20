@@ -9,7 +9,7 @@ setwd("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/GitHub/mainAnalysisSOM20"
 source("re-formatting_hypegrammaR.R")
 
 #import all necessary files (data set, dap, sampling frame, choices and questions from kobo-tool)
-df<-read.csv(file="output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored_2021_Jan_07.csv", head=T, dec=".", sep=",", stringsAsFactors = F)
+df<-read.csv(file="output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored_2021_Jan_19.csv", head=T, dec=".", sep=",", stringsAsFactors = F)
 sf<-read.csv(file="input/sampling_frame.csv", head=T, dec=".", sep=",", stringsAsFactors = F)         #from population_patching_and_weighting.R
 kobochoices <- read.csv("input/choices.csv", header = T, stringsAsFactors = F)
 koboquestions <- read.csv("input/questions.csv", header = T, stringsAsFactors = F)
@@ -93,6 +93,7 @@ list_of_results_indicators_national <-  from_analysisplan_map_to_output(df,
                                                                         questionnaire = questionnaire, confidence_level = 0.90)
 end_time <- Sys.time()                                                                                                                      #timer
 end_time - start_time                                                                                                                       #timer
+#1h
 
 #save results as R file and get it 
 list_of_results_indicators_national %>% saveRDS("output/list_of_results_indicators_national.RDS")
@@ -136,6 +137,7 @@ list_of_results_indicators_national_settlement <-  from_analysisplan_map_to_outp
                                                              questionnaire = questionnaire, confidence_level = 0.90)
 end_time <- Sys.time()                                                                                                                      #timer
 end_time - start_time                                                                                                                       #timer
+#45min
 
 #save results as R file and get it 
 list_of_results_indicators_national_settlement %>% saveRDS("output/list_of_results_indicators_national_settlement.RDS")
@@ -178,7 +180,7 @@ list_of_results_indicators_state <-  from_analysisplan_map_to_output(df,
                                                           questionnaire = questionnaire, confidence_level = 0.90)
 end_time <- Sys.time()                                                                                                                      #timer
 end_time - start_time                                                                                                                       #timer
-
+#1.18h
 
 #save results as R file and get it 
 list_of_results_indicators_state %>% saveRDS("output/list_of_results_indicators_state.RDS")
@@ -221,7 +223,7 @@ list_of_results_indicators_state_settlement <-  from_analysisplan_map_to_output(
                                                                      questionnaire = questionnaire, confidence_level = 0.90)
 end_time <- Sys.time()                                                                                                                      #timer
 end_time - start_time                                                                                                                       #timer
-
+#1.27h
 
 #save results as R file and get it 
 list_of_results_indicators_state_settlement %>% saveRDS("output/list_of_results_indicators_state_settlement.RDS")
@@ -263,7 +265,7 @@ list_of_results_indicators_region <-  from_analysisplan_map_to_output(df,
                                                           questionnaire = questionnaire, confidence_level = 0.90)
 end_time <- Sys.time()                                                                                                                      #timer
 end_time - start_time                                                                                                                       #timer
-
+#1.7h
 
 #save results as R file and get it 
 list_of_results_indicators_region %>% saveRDS("output/list_of_results_indicators_region.RDS")
@@ -306,7 +308,7 @@ list_of_results_indicators_region_settlement <-  from_analysisplan_map_to_output
                                                                                  questionnaire = questionnaire, confidence_level = 0.90)
 end_time <- Sys.time()                                                                                                                      #timer
 end_time - start_time                                                                                                                       #timer
-
+#1.7h
 
 #save results as R file and get it 
 list_of_results_indicators_region_settlement %>% saveRDS("output/list_of_results_indicators_region_settlement.RDS")
@@ -347,7 +349,7 @@ list_of_results_indicators_district <-  from_analysisplan_map_to_output(df,
                                                                         questionnaire = questionnaire, confidence_level = 0.90)
 end_time <- Sys.time()                                                                                                                      #timer
 end_time - start_time                                                                                                                       #timer
-#12.35h
+#4h
 
 
 #save results as R file and get it 
