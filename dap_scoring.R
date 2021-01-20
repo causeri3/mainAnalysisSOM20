@@ -205,6 +205,11 @@ df$no_nfi_items<-(df$nfi_access.wintting_blankets+
                     df$nfi_access.dispting_gloves+
                     df$nfi_access.mosqting_Nets)
 
+df$disp_why1_groups <- rep(NA, nrow(df))
+df$disp_why1_groups[df$disp_why1=="conflict_community" | df$disp_why1=="conflict_surrounding" |df$disp_why1=="conflict_fear" |df$disp_why1=="arrival_ags" |df$disp_why1=="withdrawal_ags"]<-1
+df$disp_why1_groups[df$disp_why1=="lack_health" | df$disp_why1=="lack_job" |df$disp_why1=="lack_water" |df$disp_why1=="lack_edu" |df$disp_why1=="lack_food"]<-2
+df$disp_why1_groups[df$disp_why1=="drought" | df$disp_why1=="flooding" |df$disp_why1=="C_19" |df$disp_why1=="livestock_disease"]<-3
+df$disp_why1_groups[df$disp_why1=="pressure_hc" | df$disp_why1=="pressure_authorities" |df$disp_why1=="eviction" |df$disp_why1=="threats"]<-4
 
 ######FSC-Indicators##################################################################################################################################################
 
@@ -846,13 +851,13 @@ LSG_dum$LSGs_dummy<-1
 LSG_dum$LSGs_dummy[which(LSG_dummy[1]==0 & LSG_dummy[2]==0 &LSG_dummy[3]==0 &LSG_dummy[4]==0 & LSG_dummy[5]==0 & LSG_dummy[6]==0 &LSG_dummy[7]==0)]<-0
 #15 households: ~ 0.15% 
 
-#count amount of LSG's scored 3,4,or 4+ for eac household
-LSG_dum$LSGs_count<-(LSG_dummy[1] + LSG_dummy[2] + LSG_dummy[3] + LSG_dummy[4] + LSG_dummy[5] + LSG_dummy[6] + LSG_dummy[7])
+#count amount of LSG's scored 3,4,or 4+ for each household
+LSG_dum$LSGs_count<-rowSums(LSG_dummy[1:7])
 
 #LSG and CG dummies, how many of the households scoring under 3 in LSG, score over 3 (or 1 as binary scoring approach) in CG
 df_CG_recoded_0<-df_CG_recoded
 df_CG_recoded_0[is.na(df_CG_recoded_0)]<-0
-which(LSG_dum$LSGs_dum==0 & df_CG_recoded_0[1]==0 & df_CG_recoded_0[2]==0 & df_CG_recoded_0[3]==0 & df_CG_recoded_0[4]==0 & df_CG_recoded_0[5]==0 & df_CG_recoded_0[6]==0 & df_CG_recoded_0[7]==0& df_CG_recoded_0[8]==0 )
+length(which(LSG_dum$LSGs_dum==0 & df_CG_recoded_0[1]==0 & df_CG_recoded_0[2]==0 & df_CG_recoded_0[3]==0 & df_CG_recoded_0[4]==0 & df_CG_recoded_0[5]==0 & df_CG_recoded_0[6]==0 & df_CG_recoded_0[7]==0& df_CG_recoded_0[8]==0))
 #8 out of 15 households have no LSG and CG "in need"(3,4,4+) ; 7 of 15 households not scoring any LSG "in need", do score a CG "in need"
 
 #LSG dummies (binary scored): check for households having at least one LSG scored 4 or 4+
@@ -868,6 +873,9 @@ df_CG_recoded_0<-df_CG_recoded
 df_CG_recoded_0[is.na(df_CG_recoded_0)]<-0
 length(which(LSG_dum_4s$LSGs_dummy_4s==0 & df_CG_recoded_0[1]==0 & df_CG_recoded_0[2]==0 & df_CG_recoded_0[3]==0 & df_CG_recoded_0[4]==0 & df_CG_recoded_0[5]==0 & df_CG_recoded_0[6]==0 & df_CG_recoded_0[7]==0& df_CG_recoded_0[8]==0 ))
 #144 -> ~ 87% of ~ 10.5% having LSG's in 1-3, have a CG "in need" (3-4+ or 1 as binary scoring approach)
+
+#count amount of LSG's scored 4,or 4+ for each household
+LSG_dum_4s$LSGs_4s_count<-rowSums(LSG_dummy_4s[1:7])
 
 #create variables for LSG-CG-relationship
 LSG_dum$LSGs_CGs<-LSG_dum$LSGs_dummy
@@ -896,33 +904,88 @@ LSG_dum$LSG_protection_CG[which(LSG_dum$LSG_protection_dummy==0 & df_CG_recoded_
 LSG_dum$LSG_protection_CG[LSG_dum$LSG_protection_CG==0]<-"LSG_under3_and_CG"
 
 
-LSG_dum_4s$LSGs_4_CGs<-LSG_dum_4s$LSGs_dummy_4s
-LSG_dum_4s$LSGs_4_CGs[LSG_dum_4s$LSGs_4_CGs==1]<-"LSG_4s"
-LSG_dum_4s$LSGs_4_CGs[which(LSG_dum_4s$LSGs_dummy_4s==0 & df_CG_recoded_0[1]==0 & df_CG_recoded_0[2]==0 & df_CG_recoded_0[3]==0 & df_CG_recoded_0[4]==0 & df_CG_recoded_0[5]==0 & df_CG_recoded_0[6]==0 & df_CG_recoded_0[7]==0& df_CG_recoded_0[8]==0)] <-"neither"
-LSG_dum_4s$LSGs_4_CGs[LSG_dum_4s$LSGs_4_CGs==0]<-"LSG_under4_and_CG"
+LSG_dum_4s$LSGs_4s_CGs<-LSG_dum_4s$LSGs_dummy_4s
+LSG_dum_4s$LSGs_4s_CGs[LSG_dum_4s$LSGs_4s_CGs==1]<-"LSG_4s"
+LSG_dum_4s$LSGs_4s_CGs[which(LSG_dum_4s$LSGs_dummy_4s==0 & df_CG_recoded_0[1]==0 & df_CG_recoded_0[2]==0 & df_CG_recoded_0[3]==0 & df_CG_recoded_0[4]==0 & df_CG_recoded_0[5]==0 & df_CG_recoded_0[6]==0 & df_CG_recoded_0[7]==0& df_CG_recoded_0[8]==0)] <-"neither"
+LSG_dum_4s$LSGs_4s_CGs[LSG_dum_4s$LSGs_4s_CGs==0]<-"LSG_under4_and_CG"
 
-LSG_dum_4s$LSG_4_education_CG<-LSG_dum_4s$LSG_education_dummy
-LSG_dum_4s$LSG_4_education_CG[LSG_dum_4s$LSG_4_education_CG==1]<-"LSG_4s"
-LSG_dum_4s$LSG_4_education_CG[which(LSG_dum_4s$LSG_education_dummy==0 & df_CG_recoded_0[1]==0 & df_CG_recoded_0[2]==0)] <-"neither"
-LSG_dum_4s$LSG_4_education_CG[LSG_dum_4s$LSG_4_education_CG==0]<-"LSG_under4_and_CG"
+LSG_dum_4s$LSG_4s_education_CG<-LSG_dum_4s$LSG_education_dummy
+LSG_dum_4s$LSG_4s_education_CG[LSG_dum_4s$LSG_4s_education_CG==1]<-"LSG_4s"
+LSG_dum_4s$LSG_4s_education_CG[which(LSG_dum_4s$LSG_education_dummy==0 & df_CG_recoded_0[1]==0 & df_CG_recoded_0[2]==0)] <-"neither"
+LSG_dum_4s$LSG_4s_education_CG[LSG_dum_4s$LSG_4s_education_CG==0]<-"LSG_under4_and_CG"
 
-LSG_dum_4s$LSG_4_FSC_CG<-LSG_dum_4s$LSG_FSC_dummy
-LSG_dum_4s$LSG_4_FSC_CG[LSG_dum_4s$LSG_4_FSC_CG==1]<-"LSG_4s"
-LSG_dum_4s$LSG_4_FSC_CG[which(LSG_dum_4s$LSG_FSC_dummy==0 & df_CG_recoded_0[3]==0)] <-"neither"
-LSG_dum_4s$LSG_4_FSC_CG[LSG_dum_4s$LSG_4_FSC_CG==0]<-"LSG_under4_and_CG"
+LSG_dum_4s$LSG_4s_FSC_CG<-LSG_dum_4s$LSG_FSC_dummy
+LSG_dum_4s$LSG_4s_FSC_CG[LSG_dum_4s$LSG_4s_FSC_CG==1]<-"LSG_4s"
+LSG_dum_4s$LSG_4s_FSC_CG[which(LSG_dum_4s$LSG_FSC_dummy==0 & df_CG_recoded_0[3]==0)] <-"neither"
+LSG_dum_4s$LSG_4s_FSC_CG[LSG_dum_4s$LSG_4s_FSC_CG==0]<-"LSG_under4_and_CG"
 
-LSG_dum_4s$LSG_4_WASH_CG<-LSG_dum_4s$LSG_WASH_dummy
-LSG_dum_4s$LSG_4_WASH_CG[LSG_dum_4s$LSG_4_WASH_CG==1]<-"LSG_4s"
-LSG_dum_4s$LSG_4_WASH_CG[which(LSG_dum_4s$LSG_WASH_dummy==0 & df_CG_recoded_0[4]==0 & df_CG_recoded_0[5]==0 & df_CG_recoded_0[6]==0)] <-"neither"
-LSG_dum_4s$LSG_4_WASH_CG[LSG_dum_4s$LSG_4_WASH_CG==0]<-"LSG_under4_and_CG"
+LSG_dum_4s$LSG_4s_WASH_CG<-LSG_dum_4s$LSG_WASH_dummy
+LSG_dum_4s$LSG_4s_WASH_CG[LSG_dum_4s$LSG_4s_WASH_CG==1]<-"LSG_4s"
+LSG_dum_4s$LSG_4s_WASH_CG[which(LSG_dum_4s$LSG_WASH_dummy==0 & df_CG_recoded_0[4]==0 & df_CG_recoded_0[5]==0 & df_CG_recoded_0[6]==0)] <-"neither"
+LSG_dum_4s$LSG_4s_WASH_CG[LSG_dum_4s$LSG_4s_WASH_CG==0]<-"LSG_under4_and_CG"
 
-LSG_dum_4s$LSG_4_protection_CG<-LSG_dum_4s$LSG_protection_dummy
-LSG_dum_4s$LSG_4_protection_CG[LSG_dum_4s$LSG_4_protection_CG==1]<-"LSG_4s"
-LSG_dum_4s$LSG_4_protection_CG[which(LSG_dum_4s$LSG_protection_dummy==0 & df_CG_recoded_0[7]==0 & df_CG_recoded_0[8]==0)] <-"neither"
-LSG_dum_4s$LSG_4_protection_CG[LSG_dum_4s$LSG_4_protection_CG==0]<-"LSG_under4_and_CG"
+LSG_dum_4s$LSG_4s_protection_CG<-LSG_dum_4s$LSG_protection_dummy
+LSG_dum_4s$LSG_4s_protection_CG[LSG_dum_4s$LSG_4s_protection_CG==1]<-"LSG_4s"
+LSG_dum_4s$LSG_4s_protection_CG[which(LSG_dum_4s$LSG_protection_dummy==0 & df_CG_recoded_0[7]==0 & df_CG_recoded_0[8]==0)] <-"neither"
+LSG_dum_4s$LSG_4s_protection_CG[LSG_dum_4s$LSG_4s_protection_CG==0]<-"LSG_under4_and_CG"
 
 #take over what is wanted for the report
 df<-cbind(df, LSG_dum, LSG_dum_4s)
+
+####################################################################################################################################################################################################################################################################################################
+######MORE VARIABLES FOR ANALYSIS (18.01.21 onward)#################################################################################################################################################################################################################################################
+####################################################################################################################################################################################################################################################################################################
+
+df$disp_why1_groups_MSNI_3<- rep(NA, nrow(df))
+df$disp_why1_groups_MSNI_3[df$disp_why1_groups==1 & df$MSNI==3]<-"group1"
+df$disp_why1_groups_MSNI_3[df$disp_why1_groups==2 & df$MSNI==3]<-"group2"
+df$disp_why1_groups_MSNI_3[df$disp_why1_groups==3 & df$MSNI==3]<-"group3"
+df$disp_why1_groups_MSNI_3[df$disp_why1_groups==4 & df$MSNI==3]<-"group4"
+
+df$disp_why1_groups_MSNI_4<- rep(NA, nrow(df))
+df$disp_why1_groups_MSNI_4[df$disp_why1_groups==1 & df$MSNI==4]<-"group1"
+df$disp_why1_groups_MSNI_4[df$disp_why1_groups==2 & df$MSNI==4]<-"group2"
+df$disp_why1_groups_MSNI_4[df$disp_why1_groups==3 & df$MSNI==4]<-"group3"
+df$disp_why1_groups_MSNI_4[df$disp_why1_groups==4 & df$MSNI==4]<-"group4"
+
+df$disp_why1_groups_MSNI_4plus<- rep(NA, nrow(df))
+df$disp_why1_groups_MSNI_4plus[df$disp_why1_groups==1 & df$MSNI=="4+"]<-"group1"
+df$disp_why1_groups_MSNI_4plus[df$disp_why1_groups==2 & df$MSNI=="4+"]<-"group2"
+df$disp_why1_groups_MSNI_4plus[df$disp_why1_groups==3 & df$MSNI=="4+"]<-"group3"
+df$disp_why1_groups_MSNI_4plus[df$disp_why1_groups==4 & df$MSNI=="4+"]<-"group4"
+
+df$breadwinner_MSNI_3<- rep(NA, nrow(df))
+df$breadwinner_MSNI_3[df$breadwinner=="adult_female" & df$MSNI==3]<-"adult_female"
+df$breadwinner_MSNI_3[df$breadwinner=="adult_male" & df$MSNI==3]<-"adult_male"
+df$breadwinner_MSNI_3[df$breadwinner=="eldery_female" & df$MSNI==3]<-"elderly_female"
+df$breadwinner_MSNI_3[df$breadwinner=="eldery_male" & df$MSNI==3]<-"elderly_male"
+
+df$breadwinner_MSNI_4<- rep(NA, nrow(df))
+df$breadwinner_MSNI_4[df$breadwinner=="adult_female" & df$MSNI==4]<-"adult_female"
+df$breadwinner_MSNI_4[df$breadwinner=="adult_male" & df$MSNI==4]<-"adult_male"
+df$breadwinner_MSNI_4[df$breadwinner=="eldery_female" & df$MSNI==4]<-"elderly_female"
+df$breadwinner_MSNI_4[df$breadwinner=="eldery_male" & df$MSNI==4]<-"elderly_male"
+
+df$breadwinner_MSNI_4plus<- rep(NA, nrow(df))
+df$breadwinner_MSNI_4plus[df$breadwinner=="adult_female" & df$MSNI=="4+"]<-"adult_female"
+df$breadwinner_MSNI_4plus[df$breadwinner=="adult_male" & df$MSNI=="4+"]<-"adult_male"
+df$breadwinner_MSNI_4plus[df$breadwinner=="eldery_female" & df$MSNI=="4+"]<-"elderly_female"
+df$breadwinner_MSNI_4plus[df$breadwinner=="eldery_male" & df$MSNI=="4+"]<-"elderly_male"
+
+df$pregnancy_MSNI<- rep(NA, nrow(df))
+df$pregnancy_MSNI[df$pregnancy=="yes" & df$MSNI==3]<-"pregnancy_MSNI_3"
+df$pregnancy_MSNI[df$pregnancy=="yes" & df$MSNI==4]<-"pregnancy_MSNI_4"
+df$pregnancy_MSNI[df$pregnancy=="yes" & df$MSNI=="4+"]<-"pregnancy_MSNI_4+"
+
+df$chronic_illness_MSNI<- rep(NA, nrow(df))
+df$chronic_illness_MSNI[df$chronic_illness=="yes" & df$MSNI==3]<-"chronic_illness_MSNI_3"
+df$chronic_illness_MSNI[df$chronic_illness=="yes" & df$MSNI==4]<-"chronic_illness_MSNI_4"
+df$chronic_illness_MSNI[df$chronic_illness=="yes" & df$MSNI=="4+"]<-"chronic_illness_MSNI_4+"
+
+df$hh_members_income_MSNI<- rep(NA, nrow(df))
+df$hh_members_income_MSNI[df$hh_members_income==0 & df$MSNI==3]<-"no_hh_members_income_MSNI_3"
+df$hh_members_income_MSNI[df$hh_members_income==0 & df$MSNI==4]<-"no_hh_members_income_MSNI_4"
+df$hh_members_income_MSNI[df$hh_members_income==0 & df$MSNI=="4+"]<-"no_hh_members_income_MSNI_4+"
 
 
 ####################################################################################################################################################################################################################################################################################################
