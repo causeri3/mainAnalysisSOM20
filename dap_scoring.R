@@ -1,5 +1,5 @@
 ######IMPORT#######################################################################################################################################################################################################################################################################################
-setwd("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/GitHub/mainAnalysisSOM20")
+# setwd("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/GitHub/mainAnalysisSOM20")
 
 df<-read.csv(file="input/REACH_SOM2006_JMCNA_IV_Data-Set_August2020_October_27_2020.csv", head=T, dec=".", sep=",",na.strings=c("NA",""," "))
 raw<-read.csv(file="C:/Users/Vanessa Causemann/Desktop/REACH/Data/REACH_SOM2006_JMCNA_IV_Data-Set_August2020_October_27_2020_RAW.csv", head=T, dec=".", sep=",")
@@ -270,11 +270,14 @@ df$A5[(child_elderly/adultish)>=0.8]<-1
 
 ######socioeconomic###################################################################################################################################################
 
+###YS higher score erase previous
 df$B1<- rep(NA, nrow(df))
 df$B1[df$income_src.business==1 | df$income_src.cash_fishing==1 |df$income_src.livestock_production==1 | df$income_src.contracted_job==1|df$income_src.cash_crop_farming==1 | df$income_src.rent_of_land==1]<-1
 df$B1[df$income_src.subsistence_farming_or_fishing==1 |df$income_src.remittances==1| df$income_src.daily_labour==1]<-3
 df$B1[df$income_src.humanitarian_assistance==1|df$income_src.sale_of_humanitarian_assistance==1 | df$income_src.none==1]<-4
 
+###YS other coded in a score of 3; not in the dap
+#same as above, higher score will erase lower
 df$B2<- rep(NA, nrow(df))
 df$B2[df$main_source_food.purchased_market==1 | df$main_source_food.own_cultivation==1 |df$main_source_food.own_livestock==1]<-1
 df$B2[df$main_source_food.bartering_Bartering==1 | df$main_source_food.fishing_Fishing==1 |df$main_source_food.foraging_Foraging==1 | df$main_source_food.hunting_Hunting==1| df$main_source_food.other==1]<-3
@@ -288,6 +291,7 @@ df$B4<- rep(NA, nrow(df))
 df$B4[df$hh_members_income>0]<-0
 df$B4[df$hh_members_income==0]<-1
 
+###YS critical indicators with a SL, 94% of the answers are NA
 df$B5<- rep(NA, nrow(df))
 df$B5[df$employ_loss_why.end_contract==1 | df$employ_loss_why.other==1]<-2
 df$B5[df$employ_loss_why.displacement==1 | df$employ_loss_why.locusts==1 |df$employ_loss_why.covid==1 | df$employ_loss_why.ill==1]<-3
@@ -338,11 +342,13 @@ df$F2<- rep(NA, nrow(df))
 df$F2[df$hand_washing_facility=="buckets_with_taps"|df$hand_washing_facility=="sink_with_tap"|df$hand_washing_facility=="tippy_tap"]<-0
 df$F2[df$hand_washing_facility=="no_specific"]<-1
 
+###YS check against dap and transport
 df$F3<- rep(NA, nrow(df))
 df$F3[df$health_time=="less15"|df$health_time=="16_30"|df$health_time=="31_60"]<-1
 df$F3[df$health_transport=="car"|df$health_transport=="cart"|df$health_transport=="moto"|df$health_transport=="bus"]<-1
 df$F3[df$health_transport=="walking" & (df$health_time=="60_180"|df$health_time=="above180")]<-4
 
+###YS check against dap and transport
 df$F4<- rep(NA, nrow(df))
 df$F4[df$market_time=="less15"|df$market_time=="min_15_29"|df$market_time=="min_30_59"]<-0
 df$F4[df$market_transport=="car"|df$market_transport=="cart"|df$market_transport=="moto"|df$market_transport=="bus"]<-0
@@ -430,6 +436,8 @@ df$LSG_education<-agg_LSG(df_G_bin,df_G_crit)
 
 ######health##########################################################################################################################################################
 
+###YS dap includes transport in this one, here you only code illness.
+#transport in dap includes only walking"
 df$H1<- rep(NA, nrow(df))
 df$H1[df$health_household.none==1]<-1
 df$H1[df$health_household.yes_diarhea==1 | df$health_household.yes_fever==1 |df$health_household.yes_cough==1 | df$health_household.yes_skin==1 |df$health_household.yes_eye==1 | df$health_household.yes_wound==1 ]<-4
@@ -438,6 +446,7 @@ df$H2<- rep(NA, nrow(df))
 df$H2[df$health_access=="no" | df$health_access=="no_seek"]<-0
 df$H2[df$health_access=="yes"]<-1
 
+###YS select multiple
 df$H3<- rep(NA, nrow(df))
 df$H3[df$health_seek.private_clinic==1 | df$health_seek.private_physician==1 |df$health_seek.private_pharmacy==1 | df$health_seek.other_private_medical==1|df$health_seek.gov_hospital==1 | df$health_seek.government_center==1 | df$health_seek.government_post==1|df$health_seek.other_public==1 | df$health_seek.community_worker==1|df$health_seek.mobile_clinic_outreach==1 |df$health_seek.community_health_worker==1 |df$health_seek.mobile_clinic==1]<-0
 df$H3[df$health_seek.relative_friend==1|df$health_seek.shop_street==1 |df$health_seek.other==1 |df$health_seek.traditional_practitioner==1]<-1
@@ -452,10 +461,14 @@ df$H5[df$unvaccinated_why.public_not_open==1 | df$unvaccinated_why.lack_staff== 
 df$H5[df$unvaccinated_why.cost_high==1 | df$unvaccinated_why.problems_civil== 1 | df$unvaccinated_why.public_clinic==1 | df$unvaccinated_why.treatment_toofar== 1| df$unvaccinated_why.no_medicine==1 | df$unvaccinated_why.no_treament== 1]<-3
 df$H5[df$unvaccinated_why.medical_refused==1 | df$unvaccinated_why.no_pwd==1]<-4
 
+###YS it seems there is a small confusion in the variable coding
+# table(df$birth_where, df$H6, useNA = "ifany")
 df$H6<- rep(NA, nrow(df))
 df$H6[df$birth_where=="doctor" | df$birth_where=="nurse" | df$birth_where=="health_center" | df$birth_where=="government_health" | df$birth_where=="other_public" | df$birth_where=="private_hospital" | df$birth_where=="private_clinic" | df$birth_where=="private_maternity" | df$birth_where=="other_private"]<-0
 df$H6[df$birth_where=="respondent_s" | df$birth_where=="other_home" ]<-1
 
+###YS it seems there is a small confusion in the variable coding
+# table(df$who_assist, df$H7, useNA = "ifany")
 df$H7<- rep(NA, nrow(df))
 df$H7[df$who_assist=="government_hospital" | df$who_assist=="government_clinic" | df$who_assist=="other_health" | df$who_assist=="traditional" | df$who_assist=="community"]<-1
 df$H7[df$who_assist=="relative" | df$who_assist=="other" ]<-3
@@ -466,6 +479,7 @@ df$H8[df$health_time=="less15"|df$health_time=="16_30"|df$health_time=="31_60"]<
 df$H8[df$health_transport=="car"|df$health_transport=="cart"|df$health_transport=="moto"|df$health_transport=="bus"]<-1
 df$H8[(df$health_transport=="walking"|df$health_transport=="have_not"|df$health_transport=="treatment_toofar") & (df$health_time=="60_180"|df$health_time=="above180")]<-4
 
+###YS does not appear in the dap
 df$H9<- rep(NA, nrow(df))
 df$H9[df$health_mobile=="yes"]<-0
 df$H9[df$health_mobile=="no"]<-1
@@ -490,6 +504,11 @@ df$LSG_health<-agg_LSG(df_H_bin,df_H_crit)
 ######nutrition#######################################################################################################################################################
 
 df$I1<- rep(NA, nrow(df))
+###YS you are only coding 3 possible outcomes out of 9. e.g. no and yes_7less is not coded
+# df %>% 
+#   select(unusually_sleepy, child_fever, I1) %>% 
+#   filter(!is.na(unusually_sleepy), is.na(I1)) %>% 
+#   View()
 df$I1[df$unusually_sleepy=="no" & df$child_fever=="no"]<-1
 df$I1[df$unusually_sleepy=="yes_7less" & df$child_fever=="yes_7less"]<-3
 df$I1[df$unusually_sleepy=="yes_7more" & df$child_fever=="yes_7more"]<-3
@@ -498,11 +517,13 @@ df$I2<- rep(NA, nrow(df))
 df$I2[df$child_thin=="no"]<-0
 df$I2[df$child_thin=="yes"]<-1
 
+###YS 8999 NAs skip logic on a skip logic
 df$I3<- rep(NA, nrow(df))
 df$I3[df$eating_normally=="yes_eating"]<-1
 df$I3[df$eating_normally=="no_less2"]<-3
 df$I3[df$eating_normally=="no_less3"]<-4
 
+###YS it says it should be nutrition enrollment,
 df$I4<- rep(NA, nrow(df))
 df$I4[df$child_thin=="no"]<-0
 df$I4[df$child_thin=="yes"]<-1
@@ -562,7 +583,7 @@ df$LSG_FSC<-agg_LSG(df_J_bin,df_J_crit)
 
 
 ######water sanitation & hygiene [WASH] ##############################################################################################################################
-
+###YS DAP scores 4 scores, while you code on 3.
 df$K1<- rep(NA, nrow(df))
 df$K1[(df$water_source_time=="water_premises" | df$water_source_time=="less_5_min" | df$water_source_time=="between_and_15_min" |df$water_source_time=="between_and_30_min") & (df$water_source=="public_tap" | df$water_source=="handpumps_Handpump"| df$water_source=="protected_well"| df$water_source=="piped_neighbors"| df$water_source=="protected_Protected"| df$water_source=="bottled_water"| df$water_source=="private_tap"| df$water_source=="neighbourhood_support")]<-1
 df$K1[df$water_source_time=="more_31min"| df$water_source=="unprotected_well" | df$water_source=="water_seller"| df$water_source=="unprotected_spring"| df$water_source=="rain_water"| df$water_source=="tanker_Tanker"]<-3
@@ -572,6 +593,8 @@ df$K2<- rep(NA, nrow(df))
 df$K2[df$enough_water.drinking==1]<-1
 df$K2[df$enough_water.drinking==0]<-4
 
+###YS DAP does not include drinking water for this indicator (maybe because it is included on its own in K2?)
+###and you are not correcting for the not enough drinking water as the other ones, hence the 75 NA.
 df$K3<- rep(NA, nrow(df))
 df$K3[df$enough_water.drinking==1 & df$enough_water.cooking==1 & df$enough_water.personal_hygiene_==1 & df$enough_water.other__domestic_purposes_==1 & df$enough_water.not_enough_water_==0]<-1
 df$K3[df$enough_water.other__domestic_purposes_==0] <-2
@@ -590,6 +613,7 @@ df$K5<- rep(NA, nrow(df))
 df$K5[df$soap_access=="yes"]<-1
 df$K5[df$soap_access=="no"]<-3
 
+###YS 3430NA
 df$K6<- rep(NA, nrow(df))
 df$K6[(df$latrine_features.door + df$latrine_features.access + df$latrine_features.walls_ + df$latrine_features.inside + df$latrine_features.lock + df$latrine_features.outside + df$latrine_features.close + df$latrine_features.marked + df$latrine_features.soap)>6]<-0
 df$K6[(df$latrine_features.door + df$latrine_features.access + df$latrine_features.walls_ + df$latrine_features.inside + df$latrine_features.lock + df$latrine_features.outside + df$latrine_features.close + df$latrine_features.marked + df$latrine_features.soap)<7]<-1
@@ -598,6 +622,7 @@ df$K7<- rep(NA, nrow(df))
 df$K7[df$waste_disposal=="covered_pit" | df$waste_disposal=="burial"]<-0
 df$K7[df$waste_disposal=="burning" | df$waste_disposal=="In_open"]<-1
 
+###YS water_barrier.don_water does not appear in the dap.
 df$K8<- rep(NA, nrow(df))
 df$K8[df$water_barrier.no_problem==1]<-1
 df$K8[df$water_barrier.water_expensive==1 | df$water_barrier.not_water==1]<-2
@@ -619,7 +644,7 @@ df$K10[df$sanitation_barriers.sanitation_full==1 | df$sanitation_barriers.sanita
 df$K10[df$sanitation_barriers.sanitation_disabilities==1 | df$sanitation_barriers.some_toilets==1 | df$sanitation_barriers.sanitation_women==1 | df$sanitation_barriers.sanitation_etc==1]<-4
 df$K10[df$sanitation_barriers.going_dangerous==1]<-"4+"
 #df[which(is.na(df$K10) & df$sanitation_barriers.other==0 & df$sanitation_barriers.don_know==0), 488:500]
-
+###YS dap scores 2 for comunal use of latrine while coding scores 3; less prefered is coded as 2 while DAP gives 3
 df$K11<- rep(NA, nrow(df))
 df$K11[df$sanitation_coping.no_problem==1]<-1
 df$K11[df$sanitation_coping.less_prefered_toilets==1]<-2
@@ -657,6 +682,7 @@ df$L1[1<df$SD & df$SD <=2]<-2
 df$L1[2<df$SD & df$SD <=2.5]<-3
 df$L1[df$SD>2.5]<-4
 
+###YS timer_ (timber?) and stick are in scored in 2 but do not appear in the dap.
 df$L2<- rep(NA, nrow(df))
 df$L2[df$shelter_type=="brick" | df$shelter_type=="stone" |df$shelter_type=="normal house"]<-1
 df$L2[df$shelter_type=="cgi" | df$shelter_type=="mud" | df$shelter_type=="collective" | (df$shelter_type=="buul" & df$idp_settlement=="no")| df$shelter_type=="stick"| df$shelter_type=="timer_"]<-2
@@ -676,6 +702,7 @@ df$L4[df$shelter_damage.severe_unsafe==1]<-4
 
 #L5: not scored: length(dot_multiples("unable_repair[.]",df)) 
 
+###YS the 4 last condition do not appear on the dap.
 df$L6<- rep(NA, nrow(df))
 df$L6[df$shelter_issues.none==1 |df$shelter_issues.unable_home==1 | df$shelter_issues.other==1 ]<-0
 df$L6[df$shelter_issues.lack_partitions==1 |df$shelter_issues.lack_inside==1 | df$shelter_issues.cooking_are==1 | df$shelter_issues.lack_per==1 | df$shelter_issues.lack_around==1  | df$shelter_issues.bathing_are==1| df$shelter_issues.lack_bathing==1 | df$shelter_issues.lack_cooking==1  | df$shelter_issues.theft==1| df$shelter_issues.other_security==1 | df$shelter_issues.fire==1  | df$shelter_issues.poor_of==1]<-1
@@ -695,6 +722,9 @@ df$L10[df$hlp_problems.disputes_tenant==1 |df$hlp_problems.rules_clear==1 | df$h
 df$L10 [df$hlp_problems.lack_documents==1 |df$hlp_problems.looting_property==1 | df$hlp_problems.threat_others==1 | df$hlp_problems.disputed_ownership==1 | df$hlp_problems.property_occupation==1  | df$hlp_problems.other==1]<-1
 df$L10[which(df$hlp_problems.none==1 & df$hlp_problems.not_sure==1)]<-NA
 
+
+###YS DAP is does not make much sense, 1-4 items scores 3 ; 4 items score 4
+#in addition, DAP selects only 9 items and should disregard all of the other ones. The sums takes 28 items
 df$L11<- rep(NA, nrow(df))
 df$L11[df$no_nfi_items==28]<-1
 df$L11[df$no_nfi_items<28 & df$no_nfi_items>4]<-2
@@ -704,7 +734,7 @@ df$L11[df$no_nfi_items<2]<-4
 #L12: not scored: length(dot_multiples("shetler_support[.]",df))
 
 #____________________________aggregate to sectoral LSG____________________________
-
+###YS L1 is in the non critical indicators, while it is a critical indicator in the DAP
 df_L_bin<-data.frame(df$L3, df$L6, df$L8, df$L9, df$L10, df$L1)
 df_L_crit<-data.frame(df$L2, df$L4, df$L11)
 df$LSG_SNFI<-agg_LSG(df_L_bin,df_L_crit)
@@ -718,6 +748,7 @@ df$M1<- rep(NA, nrow(df))
 df$M1[df$child_labor_note=="no" & df$HH_schoolaged_children>0]<-1
 df$M1[df$child_labor_note=="yes" &df$HH_schoolaged_children>0]<-3
 
+###YS see question on "child_employment"
 df$M2<- rep(NA, nrow(df))
 df$M2[df$children_away=="no"]<-1
 df$M2[df$child_study>0 | df$child_employment>0]<-2
@@ -761,6 +792,7 @@ df$M11<- rep(NA, nrow(df))
 df$M11[df$gbv_incidents=="no"]<-1
 df$M11[df$gbv_incidents=="yes"]<-4
 
+###YS refers to gbv medical services, should it be sexual_gbv_services ?
 df$M12<- rep(NA, nrow(df))
 df$M12[df$medical_services=="yes"]<-0
 df$M12[df$medical_services=="no"]<-1
