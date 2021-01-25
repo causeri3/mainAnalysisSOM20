@@ -1,5 +1,5 @@
 ######IMPORT#######################################################################################################################################################################################################################################################################################
-# setwd("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/GitHub/mainAnalysisSOM20")
+setwd("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/GitHub/mainAnalysisSOM20")
 
 df<-read.csv(file="input/REACH_SOM2006_JMCNA_IV_Data-Set_August2020_October_27_2020.csv", head=T, dec=".", sep=",",na.strings=c("NA",""," "))
 raw<-read.csv(file="C:/Users/Vanessa Causemann/Desktop/REACH/Data/REACH_SOM2006_JMCNA_IV_Data-Set_August2020_October_27_2020_RAW.csv", head=T, dec=".", sep=",")
@@ -761,8 +761,8 @@ df$M11[df$gbv_incidents=="no"]<-1
 df$M11[df$gbv_incidents=="yes"]<-4
 
 df$M12<- rep(NA, nrow(df))
-df$M12[df$medical_services=="yes"]<-0
-df$M12[df$medical_services=="no"]<-1
+df$M12[df$sexual_gbv_services=="yes"]<-0
+df$M12[df$sexual_gbv_services=="no"]<-1
 
 #____________________________aggregate to sectoral LSG____________________________
 
