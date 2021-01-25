@@ -5,7 +5,7 @@ library(tidyr)
 setwd("C:/Users/Vanessa Causemann/Desktop/REACH/RStuff/GitHub/mainAnalysisSOM20")
 
 #whole data set
-jmcna<-read.csv(file="output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored_2021_Jan_24.csv", head=T, dec=".", sep=",",na.strings=c("NA",""," "))
+jmcna<-read.csv(file="output/REACH_SOM2006_JMCNA_IV_Data-Set_with_indicators_scored_2021_Jan_25.csv", head=T, dec=".", sep=",",na.strings=c("NA",""," "))
 
 #reduced data analysis plan [dap] in order to use it as labels and for sector filter, added on missing labels for freshly scored variables
 labels<-read.csv(file="input/DAP_labels.csv", head=T, dec=".", sep=",")
